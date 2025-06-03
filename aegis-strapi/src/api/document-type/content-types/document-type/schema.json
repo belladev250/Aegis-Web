@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "document_types",
+  "info": {
+    "singularName": "document-type",
+    "pluralName": "document-types",
+    "displayName": "Document Type",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "DocumentType": {
+      "type": "string"
+    },
+    "media_asset": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::media-asset.media-asset",
+      "mappedBy": "document_type"
+    }
+  }
+}
