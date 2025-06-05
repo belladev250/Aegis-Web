@@ -14,9 +14,9 @@
     "DocumentType": {
       "type": "string"
     },
-    "media_asset": {
+    "media_assets": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::media-asset.media-asset",
       "mappedBy": "document_type"
     }

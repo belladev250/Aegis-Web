@@ -32,12 +32,6 @@
         "audios"
       ]
     },
-    "document_type": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::document-type.document-type",
-      "inversedBy": "media_asset"
-    },
     "Title": {
       "type": "text"
     },
@@ -60,6 +54,12 @@
       ],
       "type": "media",
       "multiple": true
+    },
+    "document_type": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::document-type.document-type",
+      "inversedBy": "media_assets"
     }
   }
 }

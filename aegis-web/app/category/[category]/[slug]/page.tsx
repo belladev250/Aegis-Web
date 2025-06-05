@@ -4,15 +4,37 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+// Slug normalization utility - USE THIS EVERYWHERE
+function normalizeSlug(input) {
+  if (!input) return '';
+  return input
+    .toString()
+    .toLowerCase()
+    .replace(/[‘'"]/g, '')     // Remove all types of quotes
+    .replace(/\s+/g, '-')      // Replace spaces with dashes
+    .replace(/[^\w\-]/g, '')   // Remove non-word chars except dashes
+    .replace(/\-+/g, '-')      // Replace multiple dashes with single
+    .replace(/^\-|\-$/g, '');  // Remove leading/trailing dashes
+}
+
 export default function DocumentDetailPage() {
   const params = useParams();
   const { category, slug } = params;
   const categorySlug = Array.isArray(category) ? category[0] : category;
-  const docSlug = Array.isArray(slug) ? slug[0] : slug;
+  const rawSlug = Array.isArray(slug) ? slug[0] : slug || '';
+  
+  // PROPERLY DECODE AND NORMALIZE THE INCOMING SLUG
+  const docSlug = normalizeSlug(decodeURIComponent(rawSlug));
   
   const [document, setDocument] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const categoryTitle = categorySlug === 'working-papers' ? 'Aegis Working Papers' : 
+                       categorySlug === 'policy-briefs' ? 'Aegis Policy Briefs' :
+                       categorySlug === 'journal-articles' ? 'RPHE Journal Articles' :
+                       categorySlug === 'research-projects' ? 'Research Projects' :
+                       categorySlug === 'research-events' ? 'Research Events' : 'Documents';
 
   useEffect(() => {
     const fetchDocument = async () => {
@@ -22,7 +44,7 @@ export default function DocumentDetailPage() {
       try {
         const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
         const url = `${strapiUrl}/api/media-assets?populate=*`;
-        console.log(`Fetching document with slug: ${docSlug}`);
+        console.log(`Fetching document with normalized slug: ${docSlug}`);
         
         const res = await fetch(url);
         
@@ -33,34 +55,50 @@ export default function DocumentDetailPage() {
         const data = await res.json();
         const allDocs = data.data || [];
         
-        // Find document by matching slug
+        // IMPROVED DOCUMENT FINDING WITH NORMALIZATION
         const foundDoc = allDocs.find(item => {
           const docData = item.attributes || item;
-          const itemSlug = docData.slug || 
-                         (docData.Title || docData.title || '')
-                           .toLowerCase()
-                           .replace(/\s+/g, '-') || 
-                         `doc-${item.id}`;
+          
+          // Get slug from document (either stored slug or generated from title)
+          const itemSlug = docData.slug 
+            ? normalizeSlug(docData.slug)
+            : normalizeSlug(docData.Title || docData.title || '') || `doc-${item.id}`;
+          
+          console.log('Comparing slugs:', {
+            stored: itemSlug,
+            search: docSlug,
+            match: itemSlug === docSlug
+          });
+          
           return itemSlug === docSlug;
         });
 
         if (!foundDoc) {
-          throw new Error(`Document with slug "${docSlug}" not found`);
+          console.log('Available documents:', allDocs.map(d => {
+            const dd = d.attributes || d;
+            return {
+              id: d.id,
+              storedSlug: dd.slug,
+              generatedSlug: normalizeSlug(dd.Title || ''),
+              title: dd.Title
+            };
+          }));
+          throw new Error(`Document with slug "${docSlug}" not found. Searched with normalized slug.`);
         }
 
         const docData = foundDoc.attributes || foundDoc;
         
-        // Process document data (same as in category page)
+        // Process document data
         let documentFileUrl = null;
         let documentFileName = "Document";
         let coverUrl = null;
 
         if (docData.coverImg) {
           const cover = docData.coverImg;
-          if (cover.data && Array.isArray(cover.data) && cover.data[0]?.attributes?.url) {
-            coverUrl = cover.data[0].attributes.url;
-          } else if (cover.data && cover.data?.attributes?.url) {
-            coverUrl = cover.data.attributes.url;
+          if (cover.data?.attributes?.url) {
+            coverUrl = Array.isArray(cover.data) 
+              ? cover.data[0]?.attributes?.url 
+              : cover.data?.attributes?.url;
           } else if (cover.url) {
             coverUrl = cover.url;
           }
@@ -68,12 +106,11 @@ export default function DocumentDetailPage() {
         
         if (docData.DocumentFile) {
           const fileData = docData.DocumentFile;
-          if (fileData.data && Array.isArray(fileData.data) && fileData.data[0]?.attributes?.url) {
-            documentFileUrl = fileData.data[0].attributes.url;
-            documentFileName = fileData.data[0].attributes.name || "Document";
-          } else if (fileData.data && fileData.data?.attributes?.url) {
-            documentFileUrl = fileData.data.attributes.url;
-            documentFileName = fileData.data.attributes.name || "Document";
+          if (fileData.data?.attributes?.url) {
+            documentFileUrl = Array.isArray(fileData.data) 
+              ? fileData.data[0]?.attributes?.url 
+              : fileData.data?.attributes?.url;
+            documentFileName = fileData.data?.attributes?.name || "Document";
           } else if (fileData.url) {
             documentFileUrl = fileData.url;
             documentFileName = fileData.name || "Document";
@@ -88,8 +125,8 @@ export default function DocumentDetailPage() {
           publisher: docData.Publisher || '',
           publicationDate: docData.publicationDate || '',
           documentType: docData.document_type?.data?.attributes?.name || 
-                       docData.document_type?.name || 
-                       docData.document_type?.DocumentType || '',
+                      docData.document_type?.name || 
+                      docData.document_type?.DocumentType || '',
           documentFileUrl,
           documentFileName
         });
@@ -106,6 +143,9 @@ export default function DocumentDetailPage() {
       fetchDocument();
     }
   }, [docSlug]);
+
+  // ... rest of your component remains the same
+
 
   if (isLoading) return <div className="p-8 text-center">Loading document...</div>;
   

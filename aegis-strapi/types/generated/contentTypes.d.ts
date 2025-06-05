@@ -525,8 +525,8 @@ export interface ApiDocumentTypeDocumentType
       'api::document-type.document-type'
     > &
       Schema.Attribute.Private;
-    media_asset: Schema.Attribute.Relation<
-      'oneToOne',
+    media_assets: Schema.Attribute.Relation<
+      'oneToMany',
       'api::media-asset.media-asset'
     >;
     publishedAt: Schema.Attribute.DateTime;
@@ -590,7 +590,7 @@ export interface ApiMediaAssetMediaAsset extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     document_type: Schema.Attribute.Relation<
-      'oneToOne',
+      'manyToOne',
       'api::document-type.document-type'
     >;
     DocumentFile: Schema.Attribute.Media<

@@ -28,7 +28,7 @@ export default function CategoryPage() {
         const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL ;
         
         // Fetch all documents with related data
-        const url = `${strapiUrl}/api/media-assets?populate=*`;
+        const url = `${strapiUrl}/api/media-assets?populate=*&pagination[page]=1&pagination[pageSize]=100`;
         console.log('Fetching all documents from:', url);
         
         const res = await fetch(url);
@@ -137,27 +137,32 @@ export default function CategoryPage() {
         
         // Filter by category if needed
         let filteredDocs = formattedData;
+// Normalize string safely
+const normalize = (str: string) => str?.toLowerCase().trim();
+
         if (categorySlug === 'working-papers') {
-          filteredDocs = formattedData.filter((doc:any) => 
-            doc.documentType.toLowerCase().includes('working paper')
+          filteredDocs = formattedData.filter((doc: any) =>
+            normalize(doc.documentType).includes('working')
           );
         } else if (categorySlug === 'policy-briefs') {
-          filteredDocs = formattedData.filter((doc:any) => 
-            doc.documentType.toLowerCase().includes('policy brief')
+          filteredDocs = formattedData.filter((doc: any) =>
+            normalize(doc.documentType).includes('brief')
           );
         } else if (categorySlug === 'journal-articles') {
-          filteredDocs = formattedData.filter((doc:any) => 
-            doc.documentType.toLowerCase().includes('journal')
+          filteredDocs = formattedData.filter((doc: any) =>
+            normalize(doc.documentType).includes('journal')
           );
         } else if (categorySlug === 'research-projects') {
-          filteredDocs = formattedData.filter((doc:any) => 
-            doc.documentType.toLowerCase().includes('research project')
+          filteredDocs = formattedData.filter((doc: any) =>
+            normalize(doc.documentType).includes('research project')
           );
         } else if (categorySlug === 'research-events') {
-          filteredDocs = formattedData.filter((doc:any) => 
-            doc.documentType.toLowerCase().includes('event')
+          filteredDocs = formattedData.filter((doc: any) =>
+            normalize(doc.documentType).includes('event')
           );
         }
+        
+        
         
         console.log('Filtered documents:', filteredDocs);
         setDocuments(filteredDocs);
@@ -197,11 +202,11 @@ export default function CategoryPage() {
           {documents.length > 0 ? (
             documents.map(doc => (
               <Link 
-              href={`/category/${categorySlug}/${doc.slug}`}
+              key={doc.id} href={`/category/${categorySlug}/${doc.slug}`}
             >
             
            
-              <div key={(doc as { id: string }).id} className="border rounded-lg p-0 shadow">
+              <div  className="border rounded-lg p-0 shadow">
                 {(doc as any).coverUrl && typeof (doc as any).coverUrl === 'string' && (
                   <Image
                     src={`/${(doc as any).coverUrl}`}
