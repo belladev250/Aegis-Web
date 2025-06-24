@@ -4,17 +4,22 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-// Slug normalization utility - USE THIS EVERYWHERE
+// Improved slug normalization utility - USE THIS EVERYWHERE
 function normalizeSlug(input) {
   if (!input) return '';
-  return input
+  
+  const normalized = input
     .toString()
     .toLowerCase()
-    .replace(/[‘'"]/g, '')     // Remove all types of quotes
+    .replace(/[''"]/g, '')     // Remove all types of quotes
+    .replace(/:/g, '-')        // Replace colons with dashes
     .replace(/\s+/g, '-')      // Replace spaces with dashes
     .replace(/[^\w\-]/g, '')   // Remove non-word chars except dashes
     .replace(/\-+/g, '-')      // Replace multiple dashes with single
     .replace(/^\-|\-$/g, '');  // Remove leading/trailing dashes
+    
+  console.log(`Slug normalization: "${input}" -> "${normalized}"`);
+  return normalized;
 }
 
 export default function DocumentDetailPage() {
@@ -43,7 +48,7 @@ export default function DocumentDetailPage() {
       
       try {
         const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
-        const url = `${strapiUrl}/api/media-assets?populate=*`;
+const url = `${strapiUrl}/api/media-assets?populate=*&pagination[pageSize]=1000`;
         console.log(`Fetching document with normalized slug: ${docSlug}`);
         
         const res = await fetch(url);
@@ -53,40 +58,173 @@ export default function DocumentDetailPage() {
         }
         
         const data = await res.json();
-        const allDocs = data.data || [];
+        let allDocs = data.data || [];
         
-        // IMPROVED DOCUMENT FINDING WITH NORMALIZATION
+        // Handle nested array structure - flatten if needed
+        if (allDocs.length > 0 && Array.isArray(allDocs[0])) {
+          allDocs = allDocs.flat();
+        }
+        
+        // Handle case where data might be directly an object with numeric keys
+        if (typeof allDocs === 'object' && !Array.isArray(allDocs)) {
+          // Convert object with numeric keys to array
+          allDocs = Object.values(allDocs);
+        }
+        
+        console.log("Processed allDocs:", allDocs);
+        console.log("First doc structure:", allDocs[0]);
+        
+        console.log("Raw API response structure:", data);
+        console.log("All docs length:", allDocs.length);
+        console.log("Target slug:", docSlug);
+        
+        // Test the exact slug from your data
+        const testSlug = "from-child-to-genocide-perpetrator:-narrative-identity-analysis-among-genocide-prisoners-incarcerated-in-muhanga-prison-";
+        console.log("Test normalization of stored slug:", normalizeSlug(testSlug));
+        console.log("Target slug for comparison:", docSlug);
+        console.log("Do they match?", normalizeSlug(testSlug) === docSlug);
+
+        // IMPROVED DOCUMENT FINDING WITH BETTER NORMALIZATION
+        console.log("Processing documents...");
+        allDocs.forEach((doc, i) => {
+          console.log(`Raw doc ${i}:`, doc);
+          
+          // Handle different possible data structures
+          let docData = doc;
+          if (doc.attributes) {
+            docData = doc.attributes;
+          } else if (typeof doc === 'object' && doc[0]) {
+            docData = doc[0]; // Handle array wrapping
+          } else if (typeof doc === 'object' && doc.slug) {
+            docData = doc; // Direct object
+          }
+          
+          const storedSlug = docData.slug || '';
+          const titleSlug = normalizeSlug(docData.title || docData.Title || '');
+          const normalizedStoredSlug = normalizeSlug(storedSlug);
+          
+          console.log(`Doc ${i + 1} processed:`, {
+            rawDoc: doc,
+            docData: docData,
+            title: docData.title || docData.Title,
+            storedSlug: storedSlug,
+            normalizedStoredSlug: normalizedStoredSlug,
+            titleSlug: titleSlug
+          });
+        });
+
         const foundDoc = allDocs.find(item => {
-          const docData = item.attributes || item;
+          console.log('Processing item in find:', item);
           
-          // Get slug from document (either stored slug or generated from title)
-          const itemSlug = docData.slug 
-            ? normalizeSlug(docData.slug)
-            : normalizeSlug(docData.Title || docData.title || '') || `doc-${item.id}`;
+          // Handle different possible data structures
+          let docData = item;
+          let docId = item.id;
           
-          console.log('Comparing slugs:', {
-            stored: itemSlug,
-            search: docSlug,
-            match: itemSlug === docSlug
+          if (item.attributes) {
+            docData = item.attributes;
+            docId = item.id;
+          } else if (typeof item === 'object' && item[0]) {
+            docData = item[0];
+            docId = item[0].id || item.id;
+          } else if (typeof item === 'object' && item.slug) {
+            docData = item; // Direct object access
+            docId = item.id;
+          }
+          
+          console.log('Processed docData:', docData);
+          
+          // Get all possible slug variants
+          const storedSlug = docData.slug || '';
+          const normalizedStoredSlug = normalizeSlug(storedSlug);
+          const titleSlug = normalizeSlug(docData.title || docData.Title || '');
+          const fallbackSlug = `doc-${docId}`;
+          
+          // Additional matching attempts for edge cases
+          const rawStoredSlug = storedSlug.toLowerCase().replace(/[^a-z0-9\-]/g, '').replace(/\-+/g, '-').replace(/^\-|\-$/g, '');
+          
+          // Check all possible matches
+          const matches = [
+            normalizedStoredSlug === docSlug,
+            titleSlug === docSlug,
+            fallbackSlug === docSlug,
+            rawStoredSlug === docSlug,
+            // Try exact match ignoring case
+            storedSlug.toLowerCase() === docSlug.toLowerCase()
+          ];
+          
+         const isMatch = matches.some(match => match);
+          
+          console.log('Matching attempt:', {
+            docId: docId,
+            title: docData.title || docData.Title,
+            storedSlug: storedSlug,
+            normalizedStoredSlug: normalizedStoredSlug,
+            rawStoredSlug: rawStoredSlug,
+            titleSlug: titleSlug,
+            searchSlug: docSlug,
+            matches: {
+              normalized: normalizedStoredSlug === docSlug,
+              title: titleSlug === docSlug,
+              fallback: fallbackSlug === docSlug,
+              raw: rawStoredSlug === docSlug,
+              exact: storedSlug.toLowerCase() === docSlug.toLowerCase()
+            },
+            isMatch: isMatch
           });
           
-          return itemSlug === docSlug;
+         if (isMatch) {
+  console.log('🎉 MATCH FOUND!', docData.title, docData.slug, docId);
+  return true;
+} else {
+  console.warn('❌ No match for:', {
+    docId,
+    docSlug,
+    titleSlug,
+    normalizedStoredSlug,
+    fallbackSlug,
+    storedSlug,
+  });
+}
+return false;
+          
+        
         });
 
         if (!foundDoc) {
           console.log('Available documents:', allDocs.map(d => {
-            const dd = d.attributes || d;
+
+            
+            let dd = d;
+            let dId = d.id;
+            if (d.attributes) {
+              dd = d.attributes;
+              dId = d.id;
+            } else if (typeof d === 'object' && d[0]) {
+              dd = d[0];
+              dId = d[0].id || dId;
+            }
             return {
-              id: d.id,
+              id: dId,
+              title: dd.title || dd.Title,
               storedSlug: dd.slug,
-              generatedSlug: normalizeSlug(dd.Title || ''),
-              title: dd.Title
+              normalizedStoredSlug: normalizeSlug(dd.slug || ''),
+              titleSlug: normalizeSlug(dd.title || dd.Title || '')
             };
           }));
-          throw new Error(`Document with slug "${docSlug}" not found. Searched with normalized slug.`);
+          throw new Error(`Document with slug "${docSlug}" not found. Available slugs logged to console.`);
         }
 
-        const docData = foundDoc.attributes || foundDoc;
+        // Handle different possible data structures for found document
+        let docData = foundDoc;
+        let docId = foundDoc.id;
+        
+        if (foundDoc.attributes) {
+          docData = foundDoc.attributes;
+          docId = foundDoc.id;
+        } else if (typeof foundDoc === 'object' && foundDoc[0]) {
+          docData = foundDoc[0];
+          docId = foundDoc[0].id || docId;
+        }
         
         // Process document data
         let documentFileUrl = null;
@@ -118,15 +256,16 @@ export default function DocumentDetailPage() {
         }
 
         setDocument({
-          id: foundDoc.id,
-          title: docData.Title || 'Untitled Document',
-          author: docData.Author || '',
+          id: docId,
+          title: docData.title || docData.Title || 'Untitled Document',
+          author: docData.author || docData.Author || '',
           coverUrl: coverUrl || '',
-          publisher: docData.Publisher || '',
+          publisher: docData.publisher || docData.Publisher || '',
           publicationDate: docData.publicationDate || '',
           documentType: docData.document_type?.data?.attributes?.name || 
                       docData.document_type?.name || 
-                      docData.document_type?.DocumentType || '',
+                      docData.document_type?.DocumentType || 
+                      docData.documentType || '',
           documentFileUrl,
           documentFileName
         });
@@ -143,9 +282,6 @@ export default function DocumentDetailPage() {
       fetchDocument();
     }
   }, [docSlug]);
-
-  // ... rest of your component remains the same
-
 
   if (isLoading) return <div className="p-8 text-center">Loading document...</div>;
   
@@ -169,7 +305,9 @@ export default function DocumentDetailPage() {
   );
 
   return (
-    <div className="container mx-auto p-12 mt-12">
+
+    <div className="relative z-40 min-h-screen bg-white">
+    <div className="container mx-auto p-12 mt-12 ">
       <div className="mb-6">
         <Link href="/" className="text-maroon hover:underline">Home</Link> / 
         <Link href={`/category/${categorySlug}`} className="text-maroon hover:underline"> {categorySlug}</Link> / 
@@ -246,12 +384,13 @@ export default function DocumentDetailPage() {
       
       <div className="mt-8 border-t pt-4">
         <Link 
-          href={`/category/${categorySlug}`} 
+          href={`/category/${categorySlug}`}  
           className="inline-flex items-center text-maroon font-bold hover:underline"
         >
           ← Back to {categorySlug.replace(/-/g, ' ')}
         </Link>
       </div>
+    </div>
     </div>
   );
 }
