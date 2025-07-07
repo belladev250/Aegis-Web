@@ -13,12 +13,55 @@ export default function CategoryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Category mapping
-  const categoryTitle = categorySlug === 'working-papers' ? 'Aegis Working Papers' : 
-                        categorySlug === 'policy-briefs' ? 'Aegis Policy Briefs' :
-                        categorySlug === 'journal-articles' ? 'RPHE Journal Articles' :
-                        categorySlug === 'research-projects' ? 'Research Projects' :
-                        categorySlug === 'research-events' ? 'Research Events' : 'Documents';
+  // Category mapping with dynamic content
+  const getCategoryContent = (slug) => {
+    switch(slug) {
+      case 'working-papers':
+        return {
+          title: 'AEGIS Working Papers',
+          description: 'The following research working papers were produced by Rwandan authors after their participation in the Aegis Trust programme on Research, Policy and Higher Education (RPHE).',
+          image: '/papers.jpg',
+          imageAlt: 'Working Papers Image'
+        };
+      case 'policy-briefs':
+        return {
+          title: 'AEGIS Policy Briefs',
+          description: 'Comprehensive policy briefs that translate research findings into actionable recommendations for policymakers and stakeholders in Rwanda and the broader East African region.',
+         image: '/papers.jpg',
+          imageAlt: 'Policy Briefs Image'
+        };
+      case 'journal-articles':
+        return {
+          title: 'RPHE Journal Articles',
+          description: 'Peer-reviewed journal articles published by researchers who participated in the Research, Policy and Higher Education programme, contributing to academic discourse and knowledge advancement.',
+         image: '/papers.jpg',
+          imageAlt: 'Journal Articles Image'
+        };
+      case 'research-projects':
+        return {
+          title: 'Research Projects',
+          description: 'Ongoing and completed research projects conducted under the AEGIS Trust programme, focusing on critical issues in policy, education, and social development.',
+          image: '/papers.jpg',
+          imageAlt: 'Research Projects Image'
+        };
+      case 'research-events':
+        return {
+          title: 'Research Events',
+          description: 'Documentation and resources from conferences, workshops, seminars, and other research events organized to foster knowledge sharing and collaboration among researchers.',
+          image: '/papers.jpg',
+          imageAlt: 'Research Events Image'
+        };
+      default:
+        return {
+          title: 'Documents',
+          description: 'Browse through our collection of research documents and publications.',
+         image: '/papers.jpg',
+          imageAlt: 'Documents Image'
+        };
+    }
+  };
+
+  const categoryContent = getCategoryContent(categorySlug);
 
   useEffect(() => {
     async function fetchDocuments() {
@@ -137,8 +180,8 @@ export default function CategoryPage() {
         
         // Filter by category if needed
         let filteredDocs = formattedData;
-// Normalize string safely
-const normalize = (str: string) => str?.toLowerCase().trim();
+        // Normalize string safely
+        const normalize = (str: string) => str?.toLowerCase().trim();
 
         if (categorySlug === 'working-papers') {
           filteredDocs = formattedData.filter((doc: any) =>
@@ -162,8 +205,6 @@ const normalize = (str: string) => str?.toLowerCase().trim();
           );
         }
         
-        
-        
         console.log('Filtered documents:', filteredDocs);
         setDocuments(filteredDocs);
 
@@ -177,64 +218,75 @@ const normalize = (str: string) => str?.toLowerCase().trim();
     
     fetchDocuments();
   }, [categorySlug]);
+  
   if (isLoading) return <div className="p-8 text-center">Loading...</div>;
   
   if (error) return <div className="p-8 text-center text-red-500">Error: {error}</div>;
 
   return (
     <div className='relative z-40 min-h-screen bg-white'>
-    <div className='overflow-y-auto h-full pt-24 lg:pt-32'>
-      <div className="container mx-auto flex flex-col lg:flex-row px-4 sm:px-6 lg:px-8 py-8 font-sans text-gray-800 leading-relaxed">
-        <div className='w-full lg:w-1/3 mb-8 space-y-2'>
-          <Link href="/research" className='mt-8 inline-block text-maroon font-bold hover:text-maroon-dark transition-colors'>
-            ← AEGIS Research
-          </Link>
-          <h1 className='text-2xl sm:text-3xl font-semibold mb-4 lg:mb-5 text-gray-900'>AEGIS Working Papers</h1>
-          <p>The following research working papers were produced by Rwandan authors after their participation in the Aegis Trust programme on Research, Policy and Higher Education (RPHE).</p>
+      <div className='overflow-y-auto h-full pt-24 lg:pt-32'>
+        <div className="container mx-auto flex flex-col lg:flex-row px-4 sm:px-6 lg:px-8 py-8 font-sans text-gray-800 leading-relaxed">
+          <div className='w-full lg:w-1/3 mb-8 space-y-2'>
+            <Link href="/research" className='mt-8 inline-block text-maroon font-bold hover:text-maroon-dark transition-colors'>
+              ← AEGIS Research
+            </Link>
+            <h1 className='text-2xl sm:text-3xl font-semibold mb-4 lg:mb-5 text-gray-900'>
+              {categoryContent.title}
+            </h1>
+            <p>{categoryContent.description}</p>
+          </div>
+          <div className='w-full lg:w-2/3 mt-6 lg:mt-0 flex justify-center'>
+            <Image 
+              src={categoryContent.image} 
+              alt={categoryContent.imageAlt} 
+              height={500} 
+              width={600} 
+              className='h-64 w-full md:w-[70%] rounded-lg' 
+              priority 
+            />
+          </div>
         </div>
-        <div className='w-full lg:w-2/3 mt-6 lg:mt-0 flex justify-center'>
-          <Image src='/papers.jpg' alt='Consultation Image' height={500} width={600} className='h-64 w-full md:w-[70%] rounded-lg' priority />
-        </div>
-      </div>
-      <div className='container mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans text-gray-800 leading-relaxed'>
-        <h2 className='text-2xl sm:text-3xl font-semibold mb-4 lg:mb-5 text-gray-900'>Papers</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {documents.length > 0 ? (
-            documents.map(doc => (
-              <Link 
-              key={doc.id} href={`/category/${categorySlug}/${doc.slug}`}
-            >
-            
-           
-              <div  className="border rounded-lg p-0 shadow">
-                {(doc as any).coverUrl && typeof (doc as any).coverUrl === 'string' && (
-                  <Image
-                    src={`/${(doc as any).coverUrl}`}
-                    height={300}
-                    width={300}
-                    alt="cover"
-                    className="w-full  h-[45vh] object-fill"
-                  />
-                )}
-                
-                <h2 className="text-md font-semibold p-4  text-center">
-                  {(doc as any).title || `Document ${(doc as any).documentId}`}
-                </h2>
-                
+        <div className='container mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans text-gray-800 leading-relaxed'>
+          <h2 className='text-2xl sm:text-3xl font-semibold mb-4 lg:mb-5 text-gray-900'>
+            {categorySlug === 'working-papers' ? 'Papers' :
+             categorySlug === 'policy-briefs' ? 'Policy Briefs' :
+             categorySlug === 'journal-articles' ? 'Articles' :
+             categorySlug === 'research-projects' ? 'Projects' :
+             categorySlug === 'research-events' ? 'Events' : 'Documents'}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {documents.length > 0 ? (
+              documents.map(doc => (
+                <Link 
+                  key={doc.id} 
+                  href={`/category/${categorySlug}/${doc.slug}`}
+                >
+                  <div className="border rounded-lg p-0 shadow">
+                    {(doc as any).coverUrl && typeof (doc as any).coverUrl === 'string' && (
+                      <Image
+                        src={`/${(doc as any).coverUrl}`}
+                        height={300}
+                        width={300}
+                        alt="cover"
+                        className="w-full h-[45vh] object-fill"
+                      />
+                    )}
+                    
+                    <h2 className="text-md font-semibold p-4 text-center">
+                      {(doc as any).title || `Document ${(doc as any).documentId}`}
+                    </h2>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="col-span-full text-center p-8">
+                No documents found in this category.
               </div>
-              </Link>
-            ))
-          ) : (
-            <div className="col-span-full text-center p-8">
-              No documents found in this category.
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
-  </div>
   );
 }
-
-
-

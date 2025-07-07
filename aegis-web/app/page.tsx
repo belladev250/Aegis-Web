@@ -110,8 +110,25 @@ export default function Home() {
     </Link>
   </div>
 
+   <div className="flex gap-4 border-2 border-borderColor p-4 rounded-lg cursor-pointer">
+    <Image src='/about.png' alt="default" width={80} height={80} className="self-center" />
+    <Link href="/category/research-projects" className='mt-4 inline-block text-maroon'>
+      <div className="flex items-center gap-2">
+        <p className="text-maroon text-xl">Research Projects</p>
+        <IoChevronForward className="text-maroon text-3xl" />
+      </div>
+    </Link>
+  </div>
   
-
+   <div className="flex gap-4 border-2 border-borderColor p-4 rounded-lg cursor-pointer">
+    <Image src='/about.png' alt="default" width={80} height={80} className="self-center" />
+    <Link href="/category/research-events" className='mt-4 inline-block text-maroon'>
+      <div className="flex items-center gap-2">
+        <p className="text-maroon text-xl">Aegis Research Events</p>
+        <IoChevronForward className="text-maroon text-3xl"/>
+      </div>
+    </Link>
+  </div>
   
 </div>
           </div>
