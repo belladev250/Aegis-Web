@@ -46,11 +46,12 @@ export default function CategoryPage() {
         };
       case 'research-events':
         return {
-          title: 'Research Events',
-          description: 'Documentation and resources from conferences, workshops, seminars, and other research events organized to foster knowledge sharing and collaboration among researchers.',
+          title: 'Aegis Research Events',
+          description: 'Documentation and resources from conferences, workshops, seminars, in form of audio visuals',
           image: '/papers.jpg',
-          imageAlt: 'Research Events Image'
+          imageAlt: 'research events'
         };
+
       default:
         return {
           title: 'Documents',
@@ -201,7 +202,7 @@ export default function CategoryPage() {
           );
         } else if (categorySlug === 'research-events') {
           filteredDocs = formattedData.filter((doc: any) =>
-            normalize(doc.documentType).includes('event')
+            normalize(doc.documentType).includes('events')
           );
         }
         
@@ -253,7 +254,7 @@ export default function CategoryPage() {
              categorySlug === 'policy-briefs' ? 'Policy Briefs' :
              categorySlug === 'journal-articles' ? 'Articles' :
              categorySlug === 'research-projects' ? 'Projects' :
-             categorySlug === 'research-events' ? 'Events' : 'Documents'}
+             categorySlug === 'research-events' ? 'Events' : 'Documents'} 
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {documents.length > 0 ? (

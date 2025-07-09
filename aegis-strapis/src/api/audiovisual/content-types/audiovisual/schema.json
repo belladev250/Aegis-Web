@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "audiovisuals",
+  "info": {
+    "singularName": "audiovisual",
+    "pluralName": "audiovisuals",
+    "displayName": "Audiovisual",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "Title": {
+      "type": "string"
+    },
+    "Author": {
+      "type": "string"
+    },
+    "Journal": {
+      "type": "string"
+    },
+    "Date": {
+      "type": "date"
+    },
+    "AudioUrl": {
+      "type": "string"
+    },
+    "Image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    }
+  }
+}

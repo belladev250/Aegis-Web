@@ -1,51 +1,87 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import audios from '../../data/audios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
+interface AudioData {
+  id: string;
+  title: string;
+  author: string;
+  journal: string;
+  date: string;
+  audioUrl: string;
+  imageSrc: string;
+}
+
 const AudioPage = () => {
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
-  const audio = audios.find(audio => audio.id === id);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [audio, setAudio] = useState<AudioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!audio?.audioUrl) {
-      setLoading(false);
-      return;
-    }
-
-    const loadPDF = async () => {
+    const fetchAudio = async () => {
       try {
         setLoading(true);
         setError(null);
-        
-        // Verify audio exists
-        const response = await fetch(audio.audioUrl);
-        if (!response.ok) {
-          throw new Error('Audio not found');
-        }
 
-        // For direct audio display
-        if (iframeRef.current) {
-          iframeRef.current.src = audio.audioUrl;
-        }
         
-        setLoading(false);
-      } catch (err) {
-        console.error('PDF loading error:', err);
-        setError('Failed to load PDF preview. Please try downloading the document instead.');
+const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/audiovisuals?populate=*`);
+if (!res.ok) throw new Error('Failed to fetch audio data');
+
+const json = await res.json();
+const rawAudioList = json.data; // this is an array
+const rawAudio = rawAudioList.find((item: any) => String(item.id) === String(id));
+
+if (!rawAudio) throw new Error("Audio not found");
+
+const attributes = rawAudio; // or rawAudio.attributes if using Strapi v4
+const imageUrl = attributes.Image?.url || attributes.Image?.data?.attributes?.url;
+
+const formattedAudio: AudioData = {
+  id: String(attributes.id),
+  title: attributes.Title || 'Untitled',
+  author: attributes.Author || 'Unknown Author',
+  journal: attributes.Journal || 'No Journal',
+  date: attributes.Date || 'No Date',
+  audioUrl: attributes.AudioUrl || '',
+  imageSrc: imageUrl
+    ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${imageUrl}`
+    : '/about.png',
+};
+
+setAudio(formattedAudio);
+
+
+        setAudio(formattedAudio);
+
+        // Try to preview
+      
+        if (iframeRef.current) {
+          iframeRef.current.src = formattedAudio.audioUrl;
+        }
+      } catch (err: any) {
+        console.error('Audio preview error:', err);
+        setError(err.message || 'Failed to load audio');
+      } finally {
         setLoading(false);
       }
     };
 
-    loadPDF();
-  }, [audio?.audioUrl]);
+    if (id) fetchAudio();
+  }, [id]);
+
+  const extractYouTubeId = (url: string): string => {
+  const regExp = /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|embed|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?/ ]{11})/;
+  const match = url.match(regExp);
+  return match ? match[1] : '';
+};
+
+
 
   if (!audio) {
     return (
@@ -136,13 +172,30 @@ const AudioPage = () => {
           )}
 
           {!error && !loading && (
-            <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-              <iframe
-                ref={iframeRef}
-                className="w-full min-h-[90vh]"
-                title="PDF Preview"
-                loading="lazy"
-              />
+            <div>
+              
+
+              {audio.audioUrl.includes('youtu') ? (
+  <div className="aspect-video w-full flex items-center justify-center rounded-lg overflow-hidden">
+    <iframe
+      className="w-2/3 h-[80vh]"
+      src={`https://www.youtube.com/embed/${extractYouTubeId(audio.audioUrl)}`}
+      title="YouTube Video Player"
+      frameBorder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+    />
+  </div>
+) : (
+  <iframe
+    ref={iframeRef}
+    src={audio.audioUrl}
+    className="w-full min-h-[90vh]"
+    title="Audio Preview"
+    loading="lazy"
+  />
+)}
+
             </div>
           )}
         </div>
