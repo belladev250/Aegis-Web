@@ -108,20 +108,21 @@ const AudioVisual = () => {
                             <p className='text-gray-500'>No audiovisuals found.</p>
                         </div>
                     ) : (
-                        <div className='flex flex-col lg:flex-row gap-6 w-full mt-6'>
-                            {featuredAudios.map(audio => (
-                                <FeaturedAudio
-                                    key={audio.id}
-                                    imageSrc={audio.imageSrc}
-                                    title={audio.title}
-                                    id={audio.id}
-                                    author={audio.author}
-                                    date={audio.date}
-                                    journal={audio.journal}
-                                    audioUrl={audio.audioUrl}
-                                />
-                            ))}
-                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full mt-6">
+  {featuredAudios.map(audio => (
+    <FeaturedAudio
+      key={audio.id}
+      imageSrc={audio.imageSrc}
+      title={audio.title}
+      id={audio.id}
+      author={audio.author}
+      date={audio.date}
+      journal={audio.journal}
+      audioUrl={audio.audioUrl}
+    />
+  ))}
+</div>
+
                     )}
                 </div>
             </div>

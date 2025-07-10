@@ -12,7 +12,7 @@ interface FeaturedAudioProps {
 
 const FeaturedAudio = ({ imageSrc, title, id, author, date }: FeaturedAudioProps) => {
     return (
-        <div className='w-full lg:w-1/2 xl:w-1/3 border-2 border-solid p-6 border-gray-200 rounded-md hover:shadow-lg transition-shadow'>
+        <div className='w-full  border-2 border-solid p-6 border-gray-200 rounded-md hover:shadow-lg transition-shadow'>
             <div className='relative h-48 w-full mb-4'>
                 <Image
                     src={imageSrc}
@@ -21,7 +21,7 @@ const FeaturedAudio = ({ imageSrc, title, id, author, date }: FeaturedAudioProps
                     className='object-cover rounded-md'
                 />
             </div>
-            
+
             <div className="space-y-4">
             <p className='text-xl  mb-4 font-semibold '>{title}</p>
             <p className='text-sm font-regular mb-4'>Author: {author}</p>
