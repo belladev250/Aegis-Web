@@ -13,6 +13,7 @@ interface AudioData {
   date: string;
   audioUrl: string;
   imageSrc: string;
+  theme: string;
 }
 
 const AudioPage = () => {
@@ -48,6 +49,7 @@ const formattedAudio: AudioData = {
   author: attributes.Author || 'Unknown Author',
   journal: attributes.Journal || 'No Journal',
   date: attributes.Date || 'No Date',
+  theme:attributes.Theme || 'theme',
   audioUrl: attributes.AudioUrl || '',
   imageSrc: imageUrl
     ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${imageUrl}`
@@ -120,9 +122,10 @@ setAudio(formattedAudio);
           <div className='w-full md:w-2/3 lg:w-3/4'>
             <h1 className='text-md sm:text-lg md:text-xl font-bold mb-4 text-gray-900'>{audio.title}</h1>
             <div className='space-y-1'>
-              <p className='text-base sm:text-md'><span className='font-semibold'>Author:</span> {audio.author}</p>
-              <p className='text-base sm:text-md'><span className='font-semibold'>Journal:</span> {audio.journal}</p>
-              <p className='text-base sm:text-md'><span className='font-semibold'>Published:</span> {audio.date}</p>
+              <p className='text-base sm:text-md'><span className='font-semibold'>Theme:</span> {audio.theme}</p>
+         
+              <p className='text-base sm:text-md'><span className='font-semibold'>Date of production:</span> {audio.date}</p>
+              <p className='text-base sm:text-md'><span className='font-semibold'></span> {audio.journal}</p>
             </div>
             <div className='mt-6'>
               <Link 
@@ -202,7 +205,7 @@ setAudio(formattedAudio);
 
         {/* Back button at bottom */}
         <div className='mt-8 border-t border-gray-200 pt-6'>
-          <Link href="/papers" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
+          <Link href="/audiovisual" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>

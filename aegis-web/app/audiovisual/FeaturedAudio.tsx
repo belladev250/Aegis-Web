@@ -7,6 +7,7 @@ interface FeaturedAudioProps {
     title: string;
     author: string;
     date: string;
+   
 }
 
 const FeaturedAudio = ({ imageSrc, title, id, author, date }: FeaturedAudioProps) => {
@@ -20,9 +21,12 @@ const FeaturedAudio = ({ imageSrc, title, id, author, date }: FeaturedAudioProps
                     className='object-cover rounded-md'
                 />
             </div>
-            <p className='text-lg font-medium mb-4'>{title}</p>
+            
+            <div className="space-y-4">
+            <p className='text-xl  mb-4 font-semibold '>{title}</p>
             <p className='text-sm font-regular mb-4'>Author: {author}</p>
             <p className='text-sm font-regular mb-4'>Date of Production: {date}</p>
+            </div>
             <Link
                 href={`/audiovisual/${id}`}
                 className='text-maroon hover:text-maroon-dark transition-colors duration-200 font-bold'
