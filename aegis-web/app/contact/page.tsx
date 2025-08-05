@@ -1,8 +1,55 @@
+
+'use client'
 import React from 'react';
 import Image from 'next/image';
 
+import { useState } from 'react'
+  
 const Contact = () => {
-    return (
+
+const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+  })
+
+  const [loading, setLoading] = useState(false)
+  const [result, setResult] = useState('')
+
+  const handleChange = (e:any) => {
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+  }
+
+  const handleSubmit = async (e:any) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const res = await fetch('http://localhost:1337/api/send-form', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          formType: 'partner-application',
+          formData,
+        }),
+      })
+
+      const data = await res.json()
+      setResult(data.message)
+      setFormData({
+        name: '',
+        email: '',
+        message: '',
+      })
+    } catch (error) {
+      setResult('Failed to send.')
+    } finally {
+      setLoading(false)
+    }
+  
+  } 
+  
+  return (
         <div className='relative z-40 min-h-screen bg-white'>
             {/* Scrollable content area */}
             <div className='overflow-y-auto h-full pt-24 lg:pt-32'>
@@ -45,14 +92,17 @@ const Contact = () => {
                     <div className='bg-white mt-16'>
                         <h2 className='text-xl sm:text-2xl font-semibold mb-6 text-gray-900'>Send us a message</h2>
 
-                        <form className='space-y-6 lg:w-1/3 sm:w-full'>
+                        <form className='space-y-6 lg:w-1/3 sm:w-full' suppressHydrationWarning  onSubmit={handleSubmit}>
                             <div className='space-y-1'>
                                 <label className='block text-gray-700'>
                                     Name <span className='text-maroon'>*</span>
                                 </label>
                                 <input
                                     type="text"
+                                    name="name"
                                     required
+                                    value={formData.name}
+                                    onChange={handleChange}
                                     className='w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-maroon focus:border-transparent'
                                 />
                             </div>
@@ -63,6 +113,9 @@ const Contact = () => {
                                 </label>
                                 <input
                                     type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
                                     required
                                     className='w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-maroon focus:border-transparent'
                                 />
@@ -75,6 +128,10 @@ const Contact = () => {
                                 <textarea
                                     rows={4}
                                     required
+                                     onChange={handleChange}
+                                    name="message"
+                                     value={formData.message}
+
                                     className='w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-maroon focus:border-transparent'
                                 ></textarea>
                             </div>

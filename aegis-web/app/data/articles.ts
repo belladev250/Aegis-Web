@@ -35,7 +35,7 @@ const articles: Article[] = [
     ]
   },
   {
-    id: 'peacebuilding-conference-2023',
+    id: 'africa-kommit-fellowship-program',
     imageSrc: '/n-two.png',
     title: 'AFRIKA KOMMT! FELLOWSHIP PROGRAM 2016 – 2018',
     content: 'AFRIKA KOMMT is an initiative of German Industry for Future Leaders from Sub-Saharan Africa. German businesses, including several leading companies in their respective sectors offer young African managers an insight into their operations and management methods. GIZ plans, organises and evaluates the programme.',

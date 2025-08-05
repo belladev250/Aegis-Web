@@ -12,7 +12,7 @@ const NewsPage = () => {
     {
       id: 'africa-kommit-fellowship-program',
       imageSrc: '/n-two.png',
-      title: 'AFRIKA KOMMT! FELLOWSHIP PROGRAM 2016 – 2018'
+      title: 'AFRIKA KOMMT! FELLOWSHIP PROGRAM 2016 - 2018'
     },
     {
       id: 'next-goal-for-seeds-of-peace',
