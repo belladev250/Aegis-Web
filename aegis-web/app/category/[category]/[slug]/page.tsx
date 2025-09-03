@@ -4,8 +4,20 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+interface DocumentData {
+  id: string | number;
+  title: string;
+  author: string;
+  coverUrl: string;
+  publisher: string;
+  publicationDate: string;
+  documentType: string;
+  documentFileUrl: string;
+  documentFileName: string;
+}
+
 // Improved slug normalization utility - USE THIS EVERYWHERE
-function normalizeSlug(input) {
+function normalizeSlug(input:any) {
   if (!input) return '';
   
   const normalized = input
@@ -31,7 +43,7 @@ export default function DocumentDetailPage() {
   // PROPERLY DECODE AND NORMALIZE THE INCOMING SLUG
   const docSlug = normalizeSlug(decodeURIComponent(rawSlug));
   
-  const [document, setDocument] = useState(null);
+const [document, setDocument] = useState<DocumentData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -48,7 +60,7 @@ export default function DocumentDetailPage() {
       
       try {
         const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
-const url = `${strapiUrl}/api/media-assets?populate=*&pagination[pageSize]=1000`;
+         const url = `${strapiUrl}/api/media-assets?populate=*&pagination[pageSize]=1000`;
         console.log(`Fetching document with normalized slug: ${docSlug}`);
         
         const res = await fetch(url);
@@ -77,7 +89,7 @@ const url = `${strapiUrl}/api/media-assets?populate=*&pagination[pageSize]=1000`
         console.log("Raw API response structure:", data);
         console.log("All docs length:", allDocs.length);
         console.log("Target slug:", docSlug);
-        
+         
         // Test the exact slug from your data
         const testSlug = "from-child-to-genocide-perpetrator:-narrative-identity-analysis-among-genocide-prisoners-incarcerated-in-muhanga-prison-";
         console.log("Test normalization of stored slug:", normalizeSlug(testSlug));
@@ -86,7 +98,7 @@ const url = `${strapiUrl}/api/media-assets?populate=*&pagination[pageSize]=1000`
 
         // IMPROVED DOCUMENT FINDING WITH BETTER NORMALIZATION
         console.log("Processing documents...");
-        allDocs.forEach((doc, i) => {
+        allDocs.forEach((doc:any, i:any) => {
           console.log(`Raw doc ${i}:`, doc);
           
           // Handle different possible data structures
@@ -113,7 +125,7 @@ const url = `${strapiUrl}/api/media-assets?populate=*&pagination[pageSize]=1000`
           });
         });
 
-        const foundDoc = allDocs.find(item => {
+        const foundDoc = allDocs.find((item:any) => {
           console.log('Processing item in find:', item);
           
           // Handle different possible data structures
@@ -191,7 +203,7 @@ return false;
         });
 
         if (!foundDoc) {
-          console.log('Available documents:', allDocs.map(d => {
+          console.log('Available documents:', allDocs.map((d:any) => {
 
             
             let dd = d;
@@ -270,7 +282,7 @@ return false;
           documentFileName
         });
 
-      } catch (err) {
+      } catch (err:any) {
         console.error('Fetch error:', err);
         setError(err.message);
       } finally {
@@ -334,9 +346,8 @@ return false;
       className="w-full h-auto mb-4"
       unoptimized={true} // Add this if you're having optimization issues
     />
-        
-            
-            
+
+
             {document.documentFileUrl && (
               <div className="mt-4">
                 <a
@@ -352,6 +363,7 @@ return false;
                 </a>
               </div>
             )}
+            
           </div>
         )}
         

@@ -8,7 +8,7 @@ const AudioVisual = () => {
     const [featuredAudios, setFeaturedAudios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+ 6
     useEffect(() => {
         const fetchAudiovisuals = async () => {
             try {
@@ -22,10 +22,10 @@ const AudioVisual = () => {
                 const data = await response.json();
                console.log('Raw Strapi data:', data.data);
 
-                
+               
                 // Transform Strapiata to match your component's expected format
                   
-                const transformedData = data.data.map(item => {
+                const transformedData = data.data.map((item:any) => {
     const imageUrl = item.Image?.url || item.Image?.data?.attributes?.url;
 
     return {
@@ -43,7 +43,7 @@ const AudioVisual = () => {
 
                 
                 setFeaturedAudios(transformedData);
-            } catch (err) {
+            } catch (err:any) {
                 setError(err.message);
                 console.error('Error fetching audiovisuals:', err);
             } finally {
@@ -115,7 +115,8 @@ const AudioVisual = () => {
       imageSrc={audio.imageSrc}
       title={audio.title}
       id={audio.id}
-      author={audio.author}
+      author={audio.author} 
+      
       date={audio.date}
       journal={audio.journal}
       audioUrl={audio.audioUrl}

@@ -14,7 +14,7 @@ export default function CategoryPage() {
   const [error, setError] = useState(null);
   
   // Category mapping with dynamic content
-  const getCategoryContent = (slug) => {
+  const getCategoryContent = (slug:any) => {
     switch(slug) {
       case 'working-papers':
         return {
@@ -258,7 +258,7 @@ export default function CategoryPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {documents.length > 0 ? (
-              documents.map(doc => (
+              documents.map((doc: any)=> (
                 <Link 
                   key={doc.id} 
                   href={`/category/${categorySlug}/${doc.slug}`}

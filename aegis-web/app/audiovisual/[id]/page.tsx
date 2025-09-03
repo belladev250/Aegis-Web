@@ -113,6 +113,7 @@ setAudio(formattedAudio);
                 fill
                 className='object-cover'
                 priority
+                unoptimized={true}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
             </div>
@@ -196,6 +197,8 @@ setAudio(formattedAudio);
     className="w-full min-h-[90vh]"
     title="Audio Preview"
     loading="lazy"
+    
+    
   />
 )}
 
