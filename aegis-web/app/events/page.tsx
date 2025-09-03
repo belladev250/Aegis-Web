@@ -9,7 +9,41 @@ const AegisEvents = () => {
             id: 'youth-physcial-and-mental-health',
             imageSrc: '/event-1.jpg',
             title: 'Youth Physical and Mental Health after Genocidal Rape during the 1994 Genocide against the Tutsi in Rwanda'
+        },
+        {
+            id: 'aegis-research-and-policy-conference',
+            imageSrc: '/event-2.jpg',
+            title: 'Aegis’ Research and Policy Conference'
+        },
+        {
+            id: 'aegis-trust-short-course',
+            imageSrc: '/event-3.jpg',
+            title: 'Aegis’ Research and Policy Conference'
+        },
+        {
+            id: 'first-advisory-meeting-for-the-4th-cohort-of-researchers',
+            imageSrc: '/event-4.jpg',
+            title: 'First advisory meeting for the 4th cohort of researchers'
+        },
+
+        {
+            id: 'launch-of-genocide-research-hub',
+            imageSrc: '/event-5.jpg',
+            title: 'Launch of Genocide Research Hub'
+        },
+        {
+            id: 'capacity-building-workshop-on-research-methodologies-publication-dissemination-and-uptake',
+            imageSrc: '/event-6.jpg',
+            title: 'Capacity-Building Workshop on “Research Methodologies, Publication, Dissemination and Uptake”',
+        },
+
+        {
+            id: 'rwandans-researching-rwanda-social-science-perspectives-on-post-genocide-challenges',
+            imageSrc: '/event-7.jpg',
+            title: 'Rwandans Researching Rwanda: Social Science Perspectives on Post-Genocide Challenges',
         }
+
+
     ];
 
     return (
@@ -30,7 +64,7 @@ const AegisEvents = () => {
                 </div>
                 <div className='container mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans text-gray-800 leading-relaxed'>
                     <h1 className='text-xl sm:text-2xl font-semibold text-gray-900'>Events</h1>
-                    <div className='flex flex-col lg:flex-row gap-6 w-full mt-6'>
+                    <div className='grid grid-cols-3 gap-8 w-full mt-6'>
                         {featuredEvents.map(event => (
                             <FeaturedEvent
                                 key={event.id}
