@@ -9,7 +9,7 @@ interface FeaturedArticleProps {
 
 const FeaturedArticle = ({ imageSrc, title, id }: FeaturedArticleProps) => {
   return (
-    <div className='w-full lg:w-1/2 xl:w-1/3 border-2 border-solid p-6 border-gray-200 rounded-md hover:shadow-lg transition-shadow'>
+    <div className='w-full border-2 border-solid p-6 border-gray-200 rounded-md hover:shadow-lg transition-shadow'>
       <div className='relative h-48 w-full mb-4'>
         <Image 
           src={imageSrc} 

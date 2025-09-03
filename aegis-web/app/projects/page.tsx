@@ -9,9 +9,18 @@ const ResearchProjects = () => {
             id: 'youth-physcial-and-mental-health',
             imageSrc: '/project-1.png',
             title: 'Building Cultures Of Peace In Rwandan Schools',
-            funder: 'Anne',
-            period: '2026'
+            funder: 'Global Research Fund-UK',
+            period: 'January 2020 – March 2022'
+        },
+
+        {
+            id: 'research-led-peace-education-as-crisis-prevention-in-central-africa',
+            imageSrc: '/project-2.jpg',
+            title: 'Research-Led Peace Education As Crisis Prevention In Central Africa',
+            funder: 'British Academy Funded Project',
+            period: 'March 2020 – March 2022'
         }
+
     ];
 
     return (

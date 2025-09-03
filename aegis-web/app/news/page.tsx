@@ -18,7 +18,48 @@ const NewsPage = () => {
       id: 'next-goal-for-seeds-of-peace',
       imageSrc: '/n-thre.png',
       title: 'Next goal for Seeds of Peace: Putting campers to work'
+    },
+    {
+      id: 'learning-route-on-securing-land-and-water-rights-the-cases-of-senegal-and-mauritania',
+      imageSrc: '/n-four.png',
+      title: 'Learning Route on Securing Land and Water Rights: the cases of Senegal and Mauritania'
+    },
+    {
+      id: 'central-african-republic-takes-a-small-step-towards-peace-but-a-leap-is-whats-needed',
+      imageSrc: '/n-five.png',
+      title: 'Learning Route on Securing Land and Water Rights: the cases of Senegal and Mauritania'
+    },
+    {
+      id: 'rwanda-national-dialogue-on-post-genocide-identity',
+      imageSrc: '/n-six.jpg',
+      title: 'Rwanda: national dialogue on post-genocide identity'
+    },
+    {
+      id: 'africa-leadership-initiative-fellows-train-with-aegis-on-peace-education',
+      imageSrc: '/seven.jpg',
+      title: 'Africa Leadership Initiative Fellows train with Aegis on Peace Education'
+    },
+     {
+      id: 'rwandan-parents-learn-how-to-build-peace-in-the-home',
+      imageSrc: '/n-eight.jpg',
+      title: 'Rwandan parents learn how to build peace in the home'
+    },
+    {
+      id: 'addressing-mental-health-challenges-in-a-post-genocide-society',
+      imageSrc: '/n-nine.jpg',
+      title: 'Addressing mental health challenges in a post-genocide society'
+    },
+    {
+      id: 'promoting-positive-masculinities-a-contribution-to-peace-in-rwanda',
+      imageSrc: '/n-ten.jpg',
+      title: 'Promoting Positive Masculinities – a contribution to peace in Rwanda'
+    },
+     {
+      id: 'aegis-partners-international-conference-on-peace-education-in-an-era-of-crisis',
+      imageSrc: '/n-eleven.jpg',
+      title: 'Aegis partners international conference on peace education in an era of crisis'
     }
+
   ];
 
   return ( 
@@ -37,7 +78,7 @@ const NewsPage = () => {
         </div>
         <div className='container mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans text-gray-800 leading-relaxed'>
           <h1 className='text-xl sm:text-2xl font-semibold text-gray-900'>Featured Articles</h1>
-          <div className='flex flex-col lg:flex-row gap-6 w-full mt-6'>
+          <div className='grid grid-cols-3 gap-6 mt-8'>
             {featuredArticles.map(article => (
               <FeaturedArticle
                 key={article.id}
