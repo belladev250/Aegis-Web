@@ -1,8 +1,16 @@
+'use client';
 import Image from "next/image";
 import Link from "next/link";
 import { IoChevronForward } from "react-icons/io5";
+import { useState } from "react";
 
 export default function Home() {
+  const [isResearchEventsOpen, setIsResearchEventsOpen] = useState(false);
+
+  const toggleResearchEvents = () => {
+    setIsResearchEventsOpen(!isResearchEventsOpen);
+  };
+
   return (
     <div className="relative z-20 min-h-screen bg-white scroll-smooth">
       <main>
@@ -66,64 +74,94 @@ export default function Home() {
               </div>
             </div>
 
-          {/* Research Section - Updated with simpler links */}
-<div className="lg:w-1/2 space-y-4">
-  <div className="flex gap-4 lg:gap-10 border-2 border-borderColor p-4 rounded-lg cursor-pointer">
-    <Image src='/about.png' alt="default" width={80} height={80} className="self-center" />
-    {/* <Link href="/category/working-papers" className='mt-4 inline-block text-maroon'> */}
-    <Link href="/category/working-papers" className='mt-4 inline-block text-maroon'>
+            {/* Research Section - Updated with simpler links */}
+            <div className="lg:w-1/2 space-y-4">
+              <div className="flex gap-4 lg:gap-10 border-2 border-borderColor p-4 rounded-lg cursor-pointer">
+                <Image src='/about.png' alt="default" width={80} height={80} className="self-center" />
+                <Link href="/category/working-papers" className='mt-4 inline-block text-maroon'>
+                  <div className="flex items-center gap-2">
+                    <p className="text-maroon text-xl">Aegis Working Papers</p>
+                    <IoChevronForward className="text-maroon text-3xl" />
+                  </div>
+                </Link>
+              </div>
 
-      <div className="flex items-center gap-2">
-        <p className="text-maroon text-xl">Aegis Working Papers</p>
-        <IoChevronForward className="text-maroon text-3xl" />
-      </div>
-    </Link>
-  </div>
+              <div className="flex gap-4 lg:gap-10 border-2 border-borderColor p-4 rounded-lg cursor-pointer">
+                <Image src='/about.png' alt="default" width={80} height={80} className="self-center" />
+                <Link href="/category/policy-briefs" className='mt-4 inline-block text-maroon'>
+                  <div className="flex items-center gap-2">
+                    <p className="text-maroon text-xl">Aegis Policy Briefs</p>
+                    <IoChevronForward className="text-maroon text-3xl" />
+                  </div>
+                </Link>
+              </div>
 
-  <div className="flex gap-4 lg:gap-10 border-2 border-borderColor p-4 rounded-lg cursor-pointer">
-    <Image src='/about.png' alt="default" width={80} height={80} className="self-center" />
-    <Link href="/category/policy-briefs" className='mt-4 inline-block text-maroon'>
-      <div className="flex items-center gap-2">
-        <p className="text-maroon text-xl">Aegis Policy Briefs</p>
-        <IoChevronForward className="text-maroon text-3xl" />
-      </div>
-    </Link>
-  </div>
+              <div className="flex gap-4 border-2 border-borderColor p-4 rounded-lg cursor-pointer">
+                <Image src='/about.png' alt="default" width={80} height={80} className="self-center" />
+                <Link href="/category/journal-articles" className='mt-4 inline-block text-maroon'>
+                  <div className="flex items-center gap-2">
+                    <p className="text-maroon text-xl">RPHE Journal articles and book chapters</p>
+                    <IoChevronForward className="text-maroon text-3xl" />
+                  </div>
+                </Link>
+              </div>
 
-  <div className="flex gap-4 border-2 border-borderColor p-4 rounded-lg cursor-pointer">
-    <Image src='/about.png' alt="default" width={80} height={80} className="self-center" />
-    <Link href="/category/journal-articles" className='mt-4 inline-block text-maroon'>
-      <div className="flex items-center gap-2">
-        <p className="text-maroon text-xl">RPHE Journal articles and book chapters</p>
-        <IoChevronForward className="text-maroon text-3xl" />
-      </div>
-    </Link>
-  </div>
-
-   <div className="flex gap-4 border-2 border-borderColor p-4 rounded-lg cursor-pointer">
-    <Image src='/about.png' alt="default" width={80} height={80} className="self-center" />
-    <Link href="/projects" className='mt-4 inline-block text-maroon'>
-      <div className="flex items-center gap-2">
-        <p className="text-maroon text-xl">Research Projects</p>
-        <IoChevronForward className="text-maroon text-3xl" />
-      </div>
-    </Link>
-  </div>
-  
-   <div className="flex gap-4 border-2 border-borderColor p-4 rounded-lg cursor-pointer">
-    <Image src='/about.png' alt="default" width={80} height={80} className="self-center" />
-    <Link href="/revents" className='mt-4 inline-block text-maroon'>
-      <div className="flex items-center gap-2">
-        <p className="text-maroon text-xl">Aegis Research Events</p>
-        <IoChevronForward className="text-maroon text-3xl"/>
-      </div>
-    </Link>
-  </div>
-  
-</div>
+              <div className="flex gap-4 border-2 border-borderColor p-4 rounded-lg cursor-pointer">
+                <Image src='/about.png' alt="default" width={80} height={80} className="self-center" />
+                <Link href="/projects" className='mt-4 inline-block text-maroon'>
+                  <div className="flex items-center gap-2">
+                    <p className="text-maroon text-xl">Research Projects</p>
+                    <IoChevronForward className="text-maroon text-3xl" />
+                  </div>
+                </Link>
+              </div>
+              
+              {/* Aegis Research Events with dropdown functionality */}
+              <div className="border-2 border-borderColor rounded-lg overflow-hidden">
+                <div 
+                  className="flex gap-4 p-4 cursor-pointer bg-white"
+                  onClick={toggleResearchEvents}
+                >
+                  <Image src='/about.png' alt="default" width={80} height={80} className="self-center" />
+                  <div className="flex items-center justify-between w-full">
+                    <p className="text-maroon text-xl">Aegis Research Events</p>
+                    <IoChevronForward 
+                      className={`text-maroon text-3xl transition-transform duration-300 ${isResearchEventsOpen ? 'rotate-90' : ''}`}
+                    />
+                  </div>
+                </div>
+                
+                {/* Dropdown content */}
+                {isResearchEventsOpen && (
+                  <div className="bg-gray-50 px-4 py-3 border-t border-borderColor">
+                    <div className="ml-12 space-y-3">
+                      <Link href="/revents/capacity-building" className="block text-maroon hover:text-maroon-dark transition-colors duration-200">
+                        <div className="flex items-center">
+                          <span className="mr-2">›</span>
+                          <span>Capacity Building</span>
+                        </div>
+                      </Link>
+                      <Link href="/revents/policy-engagement" className="block text-maroon hover:text-maroon-dark transition-colors duration-200">
+                        <div className="flex items-center">
+                          <span className="mr-2">›</span>
+                          <span>Policy Engagement</span>
+                        </div>
+                      </Link>
+                      <Link href="/revents/research-grant" className="block text-maroon hover:text-maroon-dark transition-colors duration-200">
+                        <div className="flex items-center">
+                          <span className="mr-2">›</span>
+                          <span>Research grant</span>
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </section>
 
+        {/* Rest of the sections remain the same */}
         {/* News Section */}
         <section className="py-16 px-4 md:px-8 lg:px-16">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-32">

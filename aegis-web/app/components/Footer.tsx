@@ -67,11 +67,11 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <FaPhone className="text-lg" />
-                <p>+250 788 123 456</p>
+                <p>0784651051</p>
               </div>
               <div className="flex items-center gap-3">
                 <FaEnvelope className="text-lg" />
-                <p>info@genocideresearchhub.org</p>
+                <p>rdpe@aegistrust.org.rw</p>
               </div>
               <div className="flex items-start gap-3">
                 <FaMapMarkerAlt className="text-lg mt-1" />

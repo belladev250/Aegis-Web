@@ -32,7 +32,7 @@ const AudioVisual = () => {
         id: String(item.id),
         title: item.Title || 'Untitled',
         author: item.Author || 'Unknown Author',
-        journal: item.Journal || 'No Journal',
+        journal: item.Journal || 'No Journal', 
         date: item.Date || 'No Date',
         audioUrl: item.AudioUrl || '',
         imageSrc: imageUrl

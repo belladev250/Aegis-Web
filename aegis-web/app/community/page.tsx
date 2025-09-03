@@ -40,7 +40,7 @@ const TeamMember = ({
                 layout="responsive"
             />
             <div className="absolute inset-0 flex flex-col bg-black bg-opacity-20 text-white px-4">
-                <div className="transform transition-all duration-500 group-hover:-translate-y-4 sm:mt-16">
+                <div className="transform transition-all duration-500 group-hover:-translate-y-4 mt-36">
                     <h2 className="text-md sm:text-lg font-bold transition-all duration-300 group-hover:text-lg sm:group-hover:text-xl">
                         {name}
                     </h2>
@@ -48,7 +48,7 @@ const TeamMember = ({
                         {position}
                     </p>
                 </div>
-                <div className="flex space-x-3 sm:space-x-4">
+                {/* <div className="flex space-x-3 sm:space-x-4">
                     {socialLinks.map((icon, index) => (
                         <a
                             key={icon.name}
@@ -61,7 +61,7 @@ const TeamMember = ({
                             </svg>
                         </a>
                     ))}
-                </div>
+                </div> */}
             </div>
         </div>
     );
@@ -140,14 +140,14 @@ const Community = () => {
                                 <TeamMember
                                     imageSrc="/aude.jpg"
                                     name="Aude Kamanzi Ibabaza"
-                                    position="Digital Content Development Coordinator"
+                                    position="Research Documentation Manager"
                                     widthClass="w-full sm:w-3/4 lg:w-[23%]"
                                 />
 
                                 <TeamMember
                                     imageSrc="/landine.jpg"
                                     name="Landine Umuhire Marie Olga"
-                                    position="Research, Policy/Programs Administrator"
+                                    position="Content Development Coordinator"
                                     widthClass="w-full sm:w-3/4 lg:w-[23%]"
                                 />
 
@@ -169,13 +169,6 @@ const Community = () => {
 
 
                                 <TeamMember
-                                    imageSrc="/urujeni.jpg"
-                                    name="Eugénie Urujeni"
-                                    position="Community Engagement & Support Officer"
-                                    widthClass="w-full sm:w-3/4 lg:w-[23%]"
-                                />
-
-                                <TeamMember
                                     imageSrc="/jacques.jpg"
                                     name="Jacques Rubayiza"
                                     position="IT & Archive Officer"
@@ -188,10 +181,8 @@ const Community = () => {
                                     position="Transcriber"
                                     widthClass="w-full sm:w-3/4 lg:w-[23%]"
                                 />
-                            </div>
 
-                            <div className="flex flex-wrap gap-5">
-                                <TeamMember
+                                     <TeamMember
                                     imageSrc="/michel.jpg"
                                     name="Michel Ndabaga"
                                     position="IT System Engineer"
@@ -199,10 +190,14 @@ const Community = () => {
                                 />
 
 
+                            </div>
+
+                            <div className="flex flex-wrap gap-5">
+                           
                                 <TeamMember
                                     imageSrc="/shema.jpg"
                                     name="Tristan Shema"
-                                    position="AV Specialist"
+                                    position="Audio-Visual Content Development Officer"
                                     widthClass="w-full sm:w-3/4 lg:w-[23%]"
                                 />
                             </div>
