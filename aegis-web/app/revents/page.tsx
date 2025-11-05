@@ -26,11 +26,7 @@ export default function ResearchEvents() {
                                 and policy makers through different programmes.</p>
                         </div>
 
-                        <div className="text-sm md:text-base">
-                            <button className="bg-maroon text-white px-6 py-2 md:px-8 md:py-3 rounded-md hover:bg-maroon/90 transition-colors w-full sm:w-auto">
-                                Submit Your Research
-                            </button>
-                        </div>
+                       
                     </div>
                 </div>
             </main>
@@ -40,7 +36,7 @@ export default function ResearchEvents() {
                         <div className="space-y-4 border w-full md:w-1/3 border-borderColor p-4 md:p-6 rounded-lg">
                             <p className="text-lg md:text-xl font-semibold">Capacity Building</p>
                             <p className="text-sm md:text-base">The aim of our capacity building programme is to bolster the enviro…</p>
-                            <Link href="/papers" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
+                            <Link href="/revents/capacity-building" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
                                 <div className="flex space-x-2 cursor-pointer">
                                     <p className="text-maroon text-sm md:text-base">Learn more </p>
                                     <IoChevronForward className="text-maroon text-lg md:text-xl" />
@@ -51,7 +47,7 @@ export default function ResearchEvents() {
                         <div className="space-y-4 border w-full md:w-1/3 border-borderColor p-4 md:p-6 rounded-lg">
                             <p className="text-lg md:text-xl font-semibold">Policy Engagement</p>
                             <p className="text-sm md:text-base">For policy and practice to be effective in its goals, it is necessary to link…</p>
-                            <Link href="/papers" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
+                            <Link href="/revents/policy-engagement" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
                                 <div className="flex space-x-2 cursor-pointer">
                                     <p className="text-maroon text-sm md:text-base">Learn more </p>
                                     <IoChevronForward className="text-maroon text-lg md:text-xl" />
@@ -62,7 +58,7 @@ export default function ResearchEvents() {
                         <div className="space-y-4 w-full md:w-1/3 border border-borderColor p-4 md:p-6 rounded-lg">
                             <p className="text-lg md:text-xl font-semibold">Research Grants</p>
                             <p className="text-sm md:text-base">The Research, Documentation, Policy and Engagement programme…</p>
-                            <Link href="/papers" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
+                            <Link href="/revents/research-grant" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
                                 <div className="flex space-x-2 cursor-pointer">
                                     <p className="text-maroon text-sm md:text-base">Learn more </p>
                                     <IoChevronForward className="text-maroon text-lg md:text-xl" />

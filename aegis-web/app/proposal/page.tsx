@@ -1,11 +1,10 @@
-"use client";
-import Link from "next/link";
-import Image from "next/image";
-import { useRef, useState } from "react";
+'use client';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useState, useRef } from 'react';
 
-export default function ResearchGrant() {
+export default function CallForProposals() {
   const formRef = useRef<HTMLElement | null>(null);
-  
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -57,7 +56,7 @@ export default function ResearchGrant() {
       const formDataToSend = new FormData();
       
       // Add form type
-      formDataToSend.append('formType', 'Research Grant Application');
+      formDataToSend.append('formType', 'Call for Proposals Submission');
       
       // Add form data as JSON string
       const formDataJson = {
@@ -65,10 +64,10 @@ export default function ResearchGrant() {
         'Last Name': formData.lastName,
         'Email Address': formData.email,
         'Phone Number': formData.phone,
-        'Application Date': formData.date,
+        'Submission Date': formData.date,
         'Research Theme': formData.theme,
-        'Abstract': formData.abstract,
-        'Submission Date': new Date().toLocaleString('en-US', { 
+        'Proposal Abstract': formData.abstract,
+        'Submitted On': new Date().toLocaleString('en-US', { 
           timeZone: 'Africa/Kigali',
           dateStyle: 'full',
           timeStyle: 'short'
@@ -90,7 +89,7 @@ export default function ResearchGrant() {
       if (response.ok) {
         setSubmitStatus({
           type: 'success',
-          message: 'Thank you for your research grant application! We will review your submission and contact you soon.'
+          message: 'Thank you for your proposal submission! We will review your application and contact you soon .'
         });
         
         // Reset form
@@ -118,7 +117,7 @@ export default function ResearchGrant() {
       console.error('Form submission error:', error);
       setSubmitStatus({
         type: 'error',
-        message: 'Failed to submit application. Please try again or contact us at rdpe@aegistrust.org.rw'
+        message: 'Failed to submit proposal. Please try again or contact us at RDPE@aegistrust.org.rw'
       });
     } finally {
       setIsSubmitting(false);
@@ -126,11 +125,11 @@ export default function ResearchGrant() {
   };
 
   return (
-    <div className="relative z-40 min-h-screen bg-white"> 
-      <div className="items-center justify-center p-24">
+    <div className="min-h-screen bg-white relative z-40">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Status Message */}
         {submitStatus.message && (
-          <div className={`mb-6 p-4 rounded-lg ${
+          <div className={`mb-6 p-4 rounded-lg mt-20 ${
             submitStatus.type === 'success' 
               ? 'bg-green-50 border border-green-200 text-green-800' 
               : 'bg-red-50 border border-red-200 text-red-800'
@@ -139,68 +138,124 @@ export default function ResearchGrant() {
           </div>
         )}
 
-        <div className="flex justify-between flex-col lg:flex-row">
-          <div className='w-full lg:w-1/2 mb-8 space-y-4'>
-            <Link href="/" className='mt-8 inline-block text-maroon font-bold hover:text-maroon-dark transition-colors'>
-              ← AEGIS Research Event
-            </Link>
-            <h1 className='text-2xl sm:text-3xl mb-4 lg:mb-5 text-gray-900'>
-              Research Grants
-            </h1>
-            <p>The Research, Documentation, Policy and Engagement programme intends to stimulate Rwandan research that is relevant to policy and practice. As a contribution to this,
-              the programme annually funds research projects by Rwandan researchers on themes relevant to genocide prevention and peace building. Non Rwandans collaborating with 
-              Rwandans can also apply for this grants.</p>
-                
-            <button 
-              onClick={scrollToForm}
-              className="mt-6 bg-maroon text-white px-6 py-2 md:px-8 md:py-3 rounded-md hover:bg-maroon/90 transition-colors w-full sm:w-auto"
-            >
-              Apply Now
-            </button>
-          </div>
-          <div className='w-full lg:w-1/2 mt-6 lg:mt-12 flex justify-center'>
-            <Image 
-              src="/grant.jpg" 
-              alt="Capacity Building"
-              height={600} 
-              width={600} 
-              className='h-64 w-full md:w-[70%] rounded-lg' 
-              priority 
-            />
-          </div>
-        </div>
+        {/* Header Section */}
+        <header className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-8 uppercase tracking-wide">
+            Call For Proposals
+          </h1>
+          
+          <div className="flex justify-between flex-col lg:flex-row">
+            <div className='w-full lg:w-1/2 mb-8 space-y-4'>
+              <h1 className='text-xl sm:text-3xl mb-4 lg:mb-5 text-gray-900'>
+                Call For Proposals
+              </h1>
+              <p className='text-gray-700'>The Research, Documentation, and Policy Engagement (RDPE) programme of Aegis Trust is pleased to launch this third Call for Proposals under the ASPIRE (Action for Sustainable Peace, Inclusion, Rights & Equality) Programme funded by the Swedish International Development Cooperation Agency (SIDA).</p>
 
-        <div className="mt-20 space-y-12">
-          <div className="space-y-4">
-            <h1 className="text-lg sm:text-3xl mb-4 lg:mb-5 text-gray-900">Application Process</h1>
-            <p>The programme publishes an annual Call for Research Proposals <Link href='/proposal' className="text-maroon"> (click here for the latest call) </Link>
-              inviting mainly Rwandan nationals. The programme also established an new research scheme <Link href='/proposals1' className="text-maroon"> (click here for the Thematic Working group research Scheme) </Link>
-              consisting of exploratory research. Rwandans main applicants may collaborate with non-Rwandan co-investigators to submit their applications. The proposals have to be in line with our themes. Projects to be funded are selected through a competitive process whereby quality, relevance and feasibility of the contemplated research are the key criteria used in their evaluation.
-              The selection of the cohort of researchers to be funded, is made by a Research Advisor with the support of the Research, Documentation, Policy and Engagement team.</p>
+              <button 
+                onClick={scrollToForm}
+                className="mt-6 bg-maroon text-white px-6 py-2 md:px-8 md:py-3 rounded-md hover:bg-maroon/90 transition-colors w-full sm:w-auto"
+              >
+                Apply Now
+              </button>
+            </div>
+            <div className='w-full lg:w-1/2 mt-6 lg:mt-12 flex justify-center'>
+              <Image 
+                src="/pc.png" 
+                alt="Capacity Building"
+                height={600} 
+                width={600} 
+                className='h-64 w-full md:w-[70%] rounded-lg' 
+                priority 
+              />
+            </div>
           </div>
+        </header>
 
-          <div className="space-y-4">
-            <h1 className="text-lg sm:text-3xl mb-4 lg:mb-5 text-gray-900">Research Strategy</h1>
-            <p>Recipients of Aegis Trust grants are expected to produce high-quality papers to be published in reputable international journals and on Aegis' online working paper series.
-              In order to foster this, the organization offers a high-quality advisory service whereby grant recipients are assigned academics with vast experience in relevant fields
-              to work with for guidance throughout the life of the project.</p>
+        {/* Main Content Section */}
+        <section className="mb-12">
+          <div className="max-w-none">
+            <p className="text-sm text-gray-700 leading-relaxed mb-6">
+              We welcome innovative submissions of proposals in English or French on topics connected to one of the following themes:
+            </p>
 
-            <p>The length of the research duration is about 10-12 months. At the end of this period, 
-              the researchers are expected to produce draft papers and policy briefs of the research projects.
-              These are then copy edited by a professional, 
-              formatted to Aegis' design and published on Aegis' online working paper series.</p>
+            <div className="space-y-6 mb-8">
+              <div>
+                <h3 className="text-base font-bold text-gray-900 mb-2">1. Governance and Social Cohesion:</h3>
+                <ul className="list-disc ml-6 space-y-1 text-sm text-gray-700">
+                  <li>Inclusive governance and the margins;</li>
+                  <li>Innovation and tradition in post-genocide governance in Rwanda: with a critical and excludible focus on home-grown initiatives (Ubudehe, Abunzi, Imihigo, Gacaca, Umuganda, Umwiherero, Itorero, Ubupfura, Umurimo, Umurongo, Agaciro, IMIHIGO);</li>
+                  <li>New insights on unity, reconciliation, and reconstruction theory, practice, actors.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-base font-bold text-gray-900 mb-2">2. Genocide, atrocity crimes, and Memorialization:</h3>
+                <ul className="list-disc ml-6 space-y-1 text-sm text-gray-700">
+                  <li>Documentation and/or Memorialization of the genocide against the Tutsi in Rwanda and beyond;</li>
+                  <li>Reintegration of genocide convicts in Rwandan society after release;</li>
+                  <li>Genocide and atrocity crimes prevention: processes, institutions, and actors.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-base font-bold text-gray-900 mb-2">3. Conflict, peacebuilding, and Peace Education:</h3>
+                <ul className="list-disc ml-6 space-y-1 text-sm text-gray-700">
+                  <li>Epistemological and/or pedagogical approaches to peace education in Rwanda and the Great Lakes region;</li>
+                  <li>Conflict, peacebuilding, and justice in Rwanda and the Great Lakes Region;</li>
+                  <li>Security, and safety in a globalised and digitalised world.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="space-y-4 text-sm text-gray-700">
+              <p>
+                Only Rwandan nationals may submit proposals as principal investigators. Rwandan main applicants may collaborate with non-Rwandan co-investigators. At least 3 proposals will receive funding. Each successful proposal will receive the Rwandan Francs equivalent of <strong>£850 British pounds</strong> (tax inclusive) to be used for researchers' remuneration and other costs associated with conducting the research (<strong>£1800</strong> will be paid upfront and <strong>£780</strong> upon the production of the outputs detailed below). The amount paid for each research proposal will be the same, regardless of the number of authors.
+              </p>
+
+              <p>Submitted proposals should be around <strong>500 words</strong> covering:</p>
+              
+              <ul className="list-disc ml-6 space-y-1">
+                <li>a brief description of the topic,</li>
+                <li>the specific research question to be answered,</li>
+                <li>a clear methodological approach, and</li>
+                <li>the paper's expected contribution to the existing knowledge.</li>
+              </ul>
+
+              <p>
+                Applicants, including any co-authors, should also submit a <strong>copy of their CV</strong>. Proposals may relate to ongoing projects (which are not yet in the final stages) or new projects that require fresh research. Both categories will be paid at the same rate.
+              </p>
+
+              <p>
+                Over the last decades, a large body of literature has been produced on Rwanda and the Great Lakes region. We therefore strongly encourage applicants to consult – and show their familiarity with – existing research to ensure that their proposals are truly innovative and likely to generate new insights and data. Applicants should, among others, be familiar with projects undertaken under previous Aegis Trust research grants available on the Genocide Research Hub.
+              </p>
+
+              <p>
+                The <strong>deadline for submitting research proposals is 18 June 2024</strong>. Shortlisted applicants will be <strong>interviewed within two weeks</strong> after the submission deadline and a final selection will be made shortly after the interviews. Successful applicants will be expected to produce: (1) a <strong>final paper by 30 June 2025</strong> to be included in the Aegis online Working Paper series; (2) a <strong>Policy Brief highlighting the paper's key findings by 31 July 2025</strong>; and (3) <strong>evidence that the working paper has been submitted for publication in an academic journal</strong> or as a chapter in an edited volume. Selected researchers will contractually undertake to strictly comply with these deadlines. <strong>The project start date will be 21 July 2025</strong>.
+              </p>
+
+              <p>
+                An initial meeting with the research advisory team will be organized at the beginning of the cohort and other meetings and events will be convened subsequently to discuss drafts produced by selected authors.
+              </p>
+
+              <p>
+                Proposals should be submitted via the Genocide Research Hub, using the application form below. For any queries on this call or technical challenges in submitting the applications using the online platform, please contact us via{' '}
+                <a href="mailto:RDPE@aegistrust.org.rw" className="text-red-900 hover:underline font-semibold">
+                  RDPE@aegistrust.org.rw
+                </a>
+              </p>
+            </div>
           </div>
-        </div>
+        </section>
 
         {/* Research Grant Application Form Section */}
         <section ref={formRef} className="mt-20 bg-gray-50 p-8 rounded-lg">
           <div className="max-w-2xl mx-auto">
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
-                Research Grant Application
+                Research Proposal Submission Form
               </h2>
               <p className="text-gray-600 text-center">
-                This form allows users to submit their research proposal for funding through our research grants programme.
+                Submit your research proposal for funding through our Call for Proposals programme.
               </p>
             </div>
 
@@ -276,7 +331,7 @@ export default function ResearchGrant() {
               {/* Date */}
               <div>
                 <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
-                  Application Date *
+                  Submission Date *
                 </label>
                 <input
                   type="date"
@@ -305,7 +360,7 @@ export default function ResearchGrant() {
                   disabled={isSubmitting}
                 >
                   <option value="">Select a theme</option>
-                  <option value="Peace Building">Peace Building</option>
+                  <option value="Peace building">Peace building</option>
                   <option value="Genocide Studies">Genocide Studies</option>
                   <option value="Peace Education">Peace Education</option>
                 </select>
@@ -314,7 +369,7 @@ export default function ResearchGrant() {
               {/* Abstract */}
               <div>
                 <label htmlFor="abstract" className="block text-sm font-medium text-gray-700 mb-2">
-                  Abstract *
+                  Proposal Abstract (approx. 500 words) *
                 </label>
                 <textarea
                   id="abstract"
@@ -323,6 +378,7 @@ export default function ResearchGrant() {
                   onChange={handleChange}
                   maxLength={500}
                   rows={4}
+                  placeholder="Include: topic description, research question, methodological approach, and expected contribution"
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-900 focus:border-red-900"
                   required
                   disabled={isSubmitting}
@@ -335,7 +391,7 @@ export default function ResearchGrant() {
               {/* Upload files */}
               <div>
                 <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-2">
-                  Upload Research Proposal *
+                  Upload Proposal & CV *
                 </label>
                 <div className="border border-gray-300 rounded-md p-4">
                   <input
@@ -346,10 +402,10 @@ export default function ResearchGrant() {
                     className="w-full"
                     required
                     disabled={isSubmitting}
-                    accept=".pdf,.doc,.docx"
+                    accept=".pdf,.doc,.docx,.zip"
                   />
                   <div className="text-sm text-gray-500 mt-2">
-                    Max. file size: 100 MB. Accepted formats: PDF, DOC, DOCX
+                    Max. file size: 100 MB. Please include your proposal and CV (can be combined in one document or zipped together)
                   </div>
                   {formData.file && (
                     <div className="text-sm text-green-600 mt-2">
@@ -366,13 +422,13 @@ export default function ResearchGrant() {
                   disabled={isSubmitting}
                   className="bg-red-900 text-white px-8 py-3 rounded-md hover:bg-red-800 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? 'Submitting...' : 'Submit Application'}
+                  {isSubmitting ? 'Submitting...' : 'Submit Proposal'}
                 </button>
               </div>
             </form>
           </div>
         </section>
       </div>
-    </div>  
+    </div>
   );
 }

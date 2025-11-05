@@ -1,6 +1,7 @@
 'use strict';
 
 const nodemailer = require('nodemailer');
+const fs = require('fs');
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -22,12 +23,23 @@ function formatFormData(formData) {
 }
 
 module.exports = {
-  async send({ formType, formData }) {
-    await transporter.sendMail({
-      from: `"GRH AEGIS TRUST FORMS" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_TO,
-      subject: `New ${formType} submission`,
-      html: formatFormData(formData),
-    });
+  async send({ formType, formData, file }) {
+const mailOptions = {
+  from: `"GRH AEGIS TRUST FORMS" <${process.env.EMAIL_USER}>`,
+  to: process.env.EMAIL_TO,
+  subject: `New ${formType} submission`,
+  html: formatFormData(formData),
+} as any;
+
+    // Add attachment if file exists
+    if (file) {
+      mailOptions.attachments = [{
+        filename: file.originalFilename || file.name,
+        content: fs.readFileSync(file.filepath),
+
+      }];
+    }
+
+    await transporter.sendMail(mailOptions);
   },
 };
