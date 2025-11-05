@@ -70,7 +70,7 @@ export default function Research() {
                         <div className="space-y-3 md:space-y-4 border w-full md:w-1/3 border-borderColor p-4 md:p-6 rounded-lg">
                             <p className="text-lg md:text-xl font-semibold"> Aegis Working Papers</p>
                             <p className="text-sm md:text-base">The followig research working papers were produced by Rwandan authors after their participation in..</p>
-                            <Link href="/papers" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
+                            <Link href="https://latest.genocideresearchhub.org.rw/category/working-papers" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
                                 <div className="flex space-x-2 cursor-pointer">
                                     <p className="text-maroon text-sm md:text-base">Learn more </p>
                                     <IoChevronForward className="text-maroon text-lg md:text-xl" />
@@ -81,7 +81,7 @@ export default function Research() {
                         <div className="space-y-3 md:space-y-4 border w-full md:w-1/3 border-borderColor p-4 md:p-6 rounded-lg">
                             <p className="text-lg md:text-xl font-semibold">Aegis's policy briefs</p>
                             <p className="text-sm md:text-base">The following policy briefs were produced by Rwandan authors after their participation in the..</p>
-                            <Link href="/papers" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
+                            <Link href="https://latest.genocideresearchhub.org.rw/category/policy-briefs" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
                                 <div className="flex space-x-2 cursor-pointer">
                                     <p className="text-maroon text-sm md:text-base">Learn more </p>
                                     <IoChevronForward className="text-maroon text-lg md:text-xl" />
@@ -92,7 +92,7 @@ export default function Research() {
                         <div className="space-y-3 md:space-y-4 border w-full md:w-1/3 border-borderColor p-4 md:p-6 rounded-lg">
                             <p className="text-lg md:text-xl font-semibold">RPHE Journal Articles and Book</p>
                             <p className="text-sm md:text-base">The following peer-reviewed journal articles and book chapters were published by .</p>
-                            <Link href="/papers" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
+                            <Link href="https://latest.genocideresearchhub.org.rw/category/journal-articles" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
                                 <div className="flex space-x-2 cursor-pointer">
                                     <p className="text-maroon text-sm md:text-base">Learn more </p>
                                     <IoChevronForward className="text-maroon text-lg md:text-xl" />
@@ -105,7 +105,7 @@ export default function Research() {
                         <div className="space-y-3 md:space-y-4 border w-full md:w-1/3 border-borderColor p-4 md:p-6 rounded-lg">
                             <p className="text-lg md:text-xl font-semibold">Research Projects</p>
                             <p className="text-sm md:text-base">Our research projects are aimed at answering diverse research ques…</p>
-                            <Link href="/projects" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
+                            <Link href="https://latest.genocideresearchhub.org.rw/projects" className='inline-flex items-center text-maroon font-bold hover:text-maroon-dark transition-colors'>
                                 <div className="flex space-x-2 cursor-pointer">
                                     <p className="text-maroon text-sm md:text-base">Learn more </p>
                                     <IoChevronForward className="text-maroon text-lg md:text-xl" />

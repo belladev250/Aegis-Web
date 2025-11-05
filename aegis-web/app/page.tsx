@@ -275,7 +275,7 @@ export default function Home() {
             <div className="space-y-4 border-2 border-borderColor p-6 rounded-lg lg:w-1/2">
               <p className="text-2xl font-bold">Share your event with our network</p>
               <p className="text-md">Please let us know about an event you are hosting that is relevant to peacebuilding, research, policy, or practice. We will publish your event details on our events page and share it with our network.</p>
-              <Link href="/submitevent" className='mt-4 inline-block text-maroon'>
+              <Link href="/submit-event" className='mt-4 inline-block text-maroon'>
                 <button className="p-4 border border-maroon text-maroon rounded-lg">Share your event</button>
               </Link>
             </div>
@@ -299,7 +299,7 @@ export default function Home() {
               <div className="space-y-4">
                 <p className="text-2xl font-bold">Propose a research project</p>
                 <p className="text-md">Our research projects are aimed at answering diverse research questions giving the opportunity to study an area of interest in depth.</p>
-                <Link href="/submitevent" className='mt-4 inline-block text-maroon'>
+                <Link href="/project" className='mt-4 inline-block text-maroon'>
                 <button className="p-4 border border-maroon text-maroon rounded-lg">Submit a proposal</button>
                 </Link>
               </div>

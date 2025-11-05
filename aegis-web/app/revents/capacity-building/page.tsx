@@ -17,7 +17,14 @@ export default function CapacityBuilding() {
              Capacity Building
             </h1>
             <p>The aim of our capacity building programme is to bolster the environment for Rwandan researchers and to stimulate research that is relevant to policy and practice, and one that meets the international standards of research integrity. If you would like to participate 
-                in our capacity building programme contact us here and check the events section for more information on any upcoming event.</p>
+                in our capacity building programme contact us <Link href='/research-strengthening-form' className="text-maroon"> here </Link>  and check the events section for more information on any upcoming event.</p>
+
+          <Link href="/revents/research-grant">
+           <button className="mt-6 bg-maroon text-white px-6 py-2 md:px-8 md:py-3 rounded-md hover:bg-maroon/90 transition-colors w-full sm:w-auto">
+            Submit Your Research
+          </button>
+          </Link>
+
           </div>
           <div className='w-full lg:w-1/2 mt-6 lg:mt-12 flex justify-center'>
             <Image 

@@ -1,6 +1,90 @@
-import React from 'react';
+'use client'
+import React, { useState } from 'react';
 
 const SubmitResearchMaterial = () => {
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        researchTitle: '',
+        type: 'Research Paper',
+        additionalInfo: '',
+        theme: '',
+        file: null as File | null,
+    })
+
+    const [loading, setLoading] = useState(false)
+    const [result, setResult] = useState('')
+
+    const handleChange = (e: any) => {
+        const { name, value } = e.target
+        setFormData({ ...formData, [name]: value })
+    }
+
+    const handleFileChange = (e: any) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            setFormData({ ...formData, file })
+        }
+    }
+
+
+
+
+   const handleSubmit = async (e: any) => {
+    e.preventDefault()
+    setLoading(true)
+    setResult('')
+
+    try {
+        const formDataToSend = new FormData()
+        formDataToSend.append('formType', 'research-material-submission')
+        formDataToSend.append('formData', JSON.stringify({
+            'First Name': formData.firstName,
+            'Last Name': formData.lastName,
+            'Email': formData.email,
+            'Phone': formData.phone,
+            'Research Title': formData.researchTitle,
+            'Type': formData.type,
+            'Additional Info': formData.additionalInfo,
+            'Theme': formData.theme,
+        }))
+        
+        if (formData.file) {
+            formDataToSend.append('file', formData.file)
+        }
+
+        const res = await fetch('http://localhost:1337/api/send-form', {
+            method: 'POST',
+            body: formDataToSend, // No headers needed
+        })
+
+        const data = await res.json()
+        setResult(data.message || 'Submission successful!')
+        
+        setFormData({
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            researchTitle: '',
+            type: 'Research Paper',
+            additionalInfo: '',
+            theme: '',
+            file: null,
+        })
+        
+        const fileInput = document.getElementById('file-upload') as HTMLInputElement
+        if (fileInput) fileInput.value = ''
+        
+    } catch (error) {
+        setResult('Failed to submit. Please try again.')
+    } finally {
+        setLoading(false)
+    }
+}
+
     return (
         <div className="relative z-40 min-h-screen bg-white mt-16 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
@@ -30,31 +114,44 @@ const SubmitResearchMaterial = () => {
                     </div>
                 </div>
 
+                {/* Result Message */}
+                {result && (
+                    <div className={`mt-6 p-4 rounded-md ${result.includes('Failed') ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`}>
+                        {result}
+                    </div>
+                )}
+
                 {/* Research Submission Form */}
                 <div className="bg-white shadow overflow-hidden sm:rounded-lg mt-16">
                     <div className="px-4 py-5 sm:p-6">
                         <h2 className="text-lg leading-6 font-medium text-gray-900">Submit Research Material</h2>
-                        <form className="space-y-6">
+                        <form className="space-y-6" onSubmit={handleSubmit}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
-                                        First name
+                                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                                        First name <span className="text-maroon">*</span>
                                     </label>
                                     <input
                                         type="text"
-                                        id="first-name"
-                                        name="first-name"
+                                        id="firstName"
+                                        name="firstName"
+                                        required
+                                        value={formData.firstName}
+                                        onChange={handleChange}
                                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-maroon-500 focus:border-maroon-500"
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="last-name" className="block text-sm font-medium text-gray-700">
-                                        Last name
+                                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                                        Last name <span className="text-maroon">*</span>
                                     </label>
                                     <input
                                         type="text"
-                                        id="last-name"
-                                        name="last-name"
+                                        id="lastName"
+                                        name="lastName"
+                                        required
+                                        value={formData.lastName}
+                                        onChange={handleChange}
                                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-maroon-500 focus:border-maroon-500"
                                     />
                                 </div>
@@ -63,47 +160,59 @@ const SubmitResearchMaterial = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                        Email
+                                        Email <span className="text-maroon">*</span>
                                     </label>
                                     <input
                                         type="email"
                                         id="email"
                                         name="email"
+                                        required
+                                        value={formData.email}
+                                        onChange={handleChange}
                                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-maroon-500 focus:border-maroon-500"
                                     />
                                 </div>
                                 <div>
                                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                                        Phone
+                                        Phone <span className="text-maroon">*</span>
                                     </label>
                                     <input
                                         type="tel"
                                         id="phone"
                                         name="phone"
+                                        required
+                                        value={formData.phone}
+                                        onChange={handleChange}
                                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-maroon-500 focus:border-maroon-500"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label htmlFor="research-title" className="block text-sm font-medium text-gray-700">
-                                    Research Title
+                                <label htmlFor="researchTitle" className="block text-sm font-medium text-gray-700">
+                                    Research Title <span className="text-maroon">*</span>
                                 </label>
                                 <input
                                     type="text"
-                                    id="research-title"
-                                    name="research-title"
+                                    id="researchTitle"
+                                    name="researchTitle"
+                                    required
+                                    value={formData.researchTitle}
+                                    onChange={handleChange}
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-maroon-500 focus:border-maroon-500"
                                 />
                             </div>
 
                             <div>
                                 <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-                                    Type
+                                    Type <span className="text-maroon">*</span>
                                 </label>
                                 <select
                                     id="type"
                                     name="type"
+                                    required
+                                    value={formData.type}
+                                    onChange={handleChange}
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-maroon-500 focus:border-maroon-500"
                                 >
                                     <option>Research Paper</option>
@@ -116,27 +225,29 @@ const SubmitResearchMaterial = () => {
                             </div>
 
                             <div>
-                                <label htmlFor="additional-info" className="block text-sm font-medium text-gray-700">
+                                <label htmlFor="additionalInfo" className="block text-sm font-medium text-gray-700">
                                     Additional information (optional)
                                 </label>
                                 <textarea
-                                    id="additional-info"
-                                    name="additional-info"
+                                    id="additionalInfo"
+                                    name="additionalInfo"
                                     rows={4}
+                                    value={formData.additionalInfo}
+                                    onChange={handleChange}
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-maroon-500 focus:border-maroon-500"
                                 ></textarea>
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Theme
+                                    Theme <span className="text-maroon">*</span>
                                 </label>
                                 <div className="space-y-2">
                                     {[
                                         "Education",
                                         "Transitional justice",
                                         "Media",
-                                        "Reconciliation and social cohesio",
+                                        "Reconciliation and social cohesion",
                                         "Peace education",
                                         "Gender dimensions of past-genocide recovery",
                                         "Post-genocide economic development",
@@ -149,6 +260,10 @@ const SubmitResearchMaterial = () => {
                                                 id={`theme-${theme.toLowerCase().replace(/\s+/g, '-')}`}
                                                 name="theme"
                                                 type="radio"
+                                                required
+                                                value={theme}
+                                                checked={formData.theme === theme}
+                                                onChange={handleChange}
                                                 className="h-4 w-4 text-maroon-600 focus:ring-maroon-500"
                                             />
                                             <label htmlFor={`theme-${theme.toLowerCase().replace(/\s+/g, '-')}`} className="ml-3 block text-sm text-gray-700">
@@ -156,27 +271,37 @@ const SubmitResearchMaterial = () => {
                                             </label>
                                         </div>
                                     ))}
-
                                 </div>
                             </div>
+
                             <div className='space-y-4'>
-                                <label htmlFor="">Upload files</label><br />
-                                <input type="file" name="research" id="" />
+                                <label htmlFor="file-upload" className="block text-sm font-medium text-gray-700">
+                                    Upload files (optional)
+                                </label>
+                                <input 
+                                    type="file" 
+                                    id="file-upload"
+                                    name="research" 
+                                    onChange={handleFileChange}
+                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-maroon file:text-white hover:file:bg-maroon-dark"
+                                />
+                                {formData.file && (
+                                    <p className="text-sm text-gray-600">Selected: {formData.file.name}</p>
+                                )}
                             </div>
 
                             <div className="pt-4">
                                 <button
                                     type="submit"
-                                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-maroon hover:bg-maroon focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-maroon-500"
+                                    disabled={loading}
+                                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-maroon hover:bg-maroon-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-maroon-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Submit Material
+                                    {loading ? 'Submitting...' : 'Submit Material'}
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
-
-
 
                 {/* Info Box */}
                 <div className="mt-10 bg-grey border-l-4 border-maroon p-4">
@@ -187,8 +312,8 @@ const SubmitResearchMaterial = () => {
                             </svg>
                         </div>
                         <div className="ml-3">
-                            <p className="text-sm text-white-700">
-                                Have questions about submissions? <a href="/contact" className="font-medium text-white-700 underline hover:text-white-600">Contact our team</a> for more information.
+                            <p className="text-sm text-gray-700">
+                                Have questions about submissions? <a href="/contact" className="font-medium text-maroon underline hover:text-maroon-dark">Contact our team</a> for more information.
                             </p>
                         </div>
                     </div>

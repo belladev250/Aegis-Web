@@ -39,7 +39,7 @@ const TeamMember = ({
                 layout="responsive"
             />
             <div className="absolute inset-0 flex flex-col bg-black bg-opacity-20 text-white px-4">
-                <div className="transform transition-all duration-500 group-hover:-translate-y-4 mt-40">
+                <div className="transform transition-all duration-500 group-hover:-translate-y-4 mt-28">
                     <h2 className="text-md sm:text-lg font-bold transition-all duration-300 group-hover:text-lg sm:group-hover:text-xl">
                         {name}
                     </h2>
@@ -108,17 +108,17 @@ const Team = () => {
                                     widthClass="w-full sm:w-3/4 lg:w-[23%]"
                                 />
 
-
+                                
                                 <TeamMember
                                     imageSrc="/aude.jpg"
-                                    name="Aude Kamanzi Ibabaza"
-                                    position="Research Documentation Manager"
+                                    name="Aude Ibabaza Kamanzi "
+                                    position="Research and Documentation Manager"
                                     widthClass="w-full sm:w-3/4 lg:w-[23%]"
                                 />
 
                                 <TeamMember
                                     imageSrc="/landine.jpg"
-                                    name="Landine Umuhire Marie Olga"
+                                    name="Landine Marie Olga Umuhire"
                                     position="Content Development Coordinator"
                                     widthClass="w-full sm:w-3/4 lg:w-[23%]"
                                 />

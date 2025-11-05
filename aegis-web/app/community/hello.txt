@@ -1,0 +1,586 @@
+'use client';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+
+interface DocumentData {
+  id: string | number;
+  title: string;
+  author: string;
+  coverUrl: string;
+  publisher: string;
+  publicationDate: string;
+  documentType: string;
+  documentFileUrl: string;
+  documentFileName: string;
+  documentFileHash: string;
+}
+
+function normalizeSlug(input: any) {
+  if (!input) return '';
+  return input.toString()
+    .toLowerCase()
+    .replace(/[''"]/g, '')
+    .replace(/:/g, '-')
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]/g, '')
+    .replace(/\-+/g, '-')
+    .replace(/^\-|\-$/g, '');
+}
+
+function constructFileUrl(fileUrl: string, baseUrl: string): string {
+  if (!fileUrl) return '';
+
+  if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
+    return fileUrl;
+  }
+
+  if (fileUrl.startsWith('/')) {
+    return `${baseUrl}${fileUrl}`;
+  }
+
+  return `${baseUrl}/uploads/${fileUrl}`;
+}
+
+const getGoogleViewerUrl = (pdfUrl: string) => {
+  return `https://docs.google.com/gview?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
+};
+
+export default function DocumentDetailPage() {
+  const params = useParams();
+  const { category, slug } = params;
+  const categorySlug = Array.isArray(category) ? category[0] : category;
+  const rawSlug = Array.isArray(slug) ? slug[0] : slug || '';
+
+  // Check if slug is actually an ID (numeric)
+  const isIdSlug = /^\d+$/.test(rawSlug);
+  const docSlug = isIdSlug ? rawSlug : normalizeSlug(decodeURIComponent(rawSlug));
+
+  const [document, setDocument] = useState<DocumentData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [pdfAccessible, setPdfAccessible] = useState(false);
+  const [imageAccessible, setImageAccessible] = useState(false);
+
+  const categoryTitle = categorySlug === 'working-papers' ? 'Aegis Working Papers' :
+                       categorySlug === 'policy-briefs' ? 'Aegis Policy Briefs' :
+                       categorySlug === 'journal-articles' ? 'RPHE Journal Articles' :
+                       categorySlug === 'research-projects' ? 'Research Projects' :
+                       categorySlug === 'research-events' ? 'Research Events' : 'Documents';
+
+  useEffect(() => {
+    const fetchDocument = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+        const url = `${strapiUrl}/api/media-assets?populate=*&sort=createdAt:desc&pagination[page]=1&pagination[pageSize]=100`;
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+
+        const data = await res.json();
+        const allDocs = Array.isArray(data.data) ? data.data : [];
+
+        console.log('Total documents loaded:', allDocs.length);
+        console.log('Looking for:', isIdSlug ? `ID: ${docSlug}` : `Slug: ${docSlug}`);
+        console.log('Category:', categorySlug);
+
+        // Step 1: Find documents - try ID first, then slug matching
+        let matchingDocs = [];
+
+        if (isIdSlug) {
+          // If slug is numeric, treat it as an ID
+          console.log('🔍 Searching by ID:', docSlug);
+          matchingDocs = allDocs.filter((item: any) => item.id.toString() === docSlug);
+          console.log('Found by ID:', matchingDocs.length);
+        } else {
+          // Otherwise, search by slug/title as before
+          console.log('🔍 Searching by slug/title:', docSlug);
+          matchingDocs = allDocs.filter((item: any) => {
+            const docData = item.attributes || item;
+            const storedSlug = docData.slug || '';
+            const normalizedStoredSlug = normalizeSlug(storedSlug);
+            const titleSlug = normalizeSlug(docData.title || docData.Title || '');
+
+            return normalizedStoredSlug === docSlug || titleSlug === docSlug;
+          });
+          console.log('Found by slug/title:', matchingDocs.length);
+        }
+
+        if (matchingDocs.length === 0) {
+          throw new Error(`Document with ${isIdSlug ? 'ID' : 'slug'} "${docSlug}" not found`);
+        }
+
+        // If we found by ID, use that document directly (no category filtering needed)
+        let finalDocument = matchingDocs[0];
+
+        // Only do category filtering if we're matching by slug and have multiple matches
+        if (!isIdSlug && matchingDocs.length > 1) {
+          console.log('📋 Multiple documents found with same slug, filtering by category:', categorySlug);
+
+          // @ts-ignore
+          console.log('All matching documents:', matchingDocs.map(doc => {
+            const docData = doc.attributes || doc;
+            return {
+              id: doc.id,
+              title: docData.title,
+              documentType: docData.document_type?.data?.attributes?.name || docData.document_type?.name || 'Unknown'
+            };
+          }));
+
+          // Method 1: Try exact document type matching first
+          const exactTypeMatches = matchingDocs.filter((item: any) => {
+            const docData = item.attributes || item;
+            const docTypeData = docData.document_type?.data?.attributes || docData.document_type || {};
+            const docTypeName = (docTypeData.name || '').toLowerCase().trim();
+
+            console.log('Checking document type:', docTypeName, 'for category:', categorySlug);
+
+            // More specific matching
+            if (categorySlug === 'working-papers') {
+              return docTypeName.includes('working') || docTypeName.includes('paper') || docTypeName === 'wp';
+            } else if (categorySlug === 'policy-briefs') {
+              return docTypeName.includes('policy') || docTypeName.includes('brief') || docTypeName === 'pb';
+            }
+
+            return false;
+          });
+
+          console.log('✅ Exact type matches found:', exactTypeMatches.length);
+
+          if (exactTypeMatches.length > 0) {
+            finalDocument = exactTypeMatches[0];
+            console.log('✅ Selected document based on exact document type match');
+          } else {
+            // Method 2: Try URL-based filtering
+            console.log('🔗 No exact type matches, trying URL filtering...');
+
+            const urlMatches = matchingDocs.filter((item: any) => {
+              const docData = item.attributes || item;
+              let fileUrl = '';
+
+              if (docData.DocumentFile?.data?.attributes?.url) {
+                fileUrl = docData.DocumentFile.data.attributes.url.toLowerCase();
+              } else if (docData.DocumentFile?.url) {
+                fileUrl = docData.DocumentFile.url.toLowerCase();
+              }
+
+              console.log('Checking URL:', fileUrl);
+
+              if (categorySlug === 'working-papers') {
+                return fileUrl.includes('working') || fileUrl.includes('wp') || fileUrl.includes('paper');
+              } else if (categorySlug === 'policy-briefs') {
+                return fileUrl.includes('policy') || fileUrl.includes('brief') || fileUrl.includes('pb');
+              }
+
+              return false;
+            });
+
+            if (urlMatches.length > 0) {
+              finalDocument = urlMatches[0];
+              console.log('✅ Selected document based on URL matching');
+            } else {
+              // Method 3: Try filename-based filtering with improved logic
+              console.log('📁 No URL matches, trying filename filtering...');
+
+              const fileNameMatches = matchingDocs.filter((item: any) => {
+                const docData = item.attributes || item;
+                let fileName = '';
+
+                if (docData.DocumentFile?.data?.attributes?.name) {
+                  fileName = docData.DocumentFile.data.attributes.name.toLowerCase();
+                } else if (docData.DocumentFile?.name) {
+                  fileName = docData.DocumentFile.name.toLowerCase();
+                } else if (docData.documentFileName) {
+                  fileName = docData.documentFileName.toLowerCase();
+                }
+
+                console.log('Checking filename:', fileName);
+                console.log('Filename length:', fileName.length);
+
+                // Enhanced matching logic
+                if (categorySlug === 'working-papers') {
+                  // Check for explicit keywords first
+                  if (fileName.includes('working') || fileName.includes('wp') || fileName.includes('paper')) {
+                    console.log('✅ Working paper keyword found in filename');
+                    return true;
+                  }
+                  // Working papers typically have longer, more detailed filenames
+                  // If filename is very long (>80 chars) and contains full title, it's likely a working paper
+                  if (fileName.length > 80 && fileName.includes('singing') && fileName.includes('struggle')) {
+                    console.log('✅ Long detailed filename detected - likely working paper');
+                    return true;
+                  }
+                  return false;
+                } else if (categorySlug === 'policy-briefs') {
+                  // Check for explicit keywords first
+                  if (fileName.includes('policy') || fileName.includes('brief') || fileName.includes('pb')) {
+                    console.log('✅ Policy brief keyword found in filename');
+                    return true;
+                  }
+                  // Policy briefs typically have shorter, simpler filenames
+                  // If filename is short (<50 chars) and simple, it's likely a policy brief
+                  if (fileName.length < 50 && !fileName.includes('singing the struggle the rwandan')) {
+                    console.log('✅ Short simple filename detected - likely policy brief');
+                    return true;
+                  }
+                  return false;
+                }
+
+                return false;
+              });
+
+              if (fileNameMatches.length > 0) {
+                finalDocument = fileNameMatches[0];
+                console.log('✅ Selected document based on filename matching');
+              } else {
+                // Method 4: Use publication date as tie-breaker
+                console.log('📅 No clear matches found, using date-based selection...');
+
+                const sortedByDate = [...matchingDocs].sort((a, b) => {
+                  // @ts-ignore
+                  const aData = a.attributes || a;
+                  // @ts-ignore
+                  const bData = b.attributes || b;
+
+                  const aDate = new Date(aData.publicationDate || aData.createdAt || 0);
+                  const bDate = new Date(bData.publicationDate || bData.createdAt || 0);
+
+                  // For working papers, prefer newer; for policy briefs, prefer older
+                  if (categorySlug === 'working-papers') {
+                    return bDate.getTime() - aDate.getTime();
+                  } else {
+                    return aDate.getTime() - bDate.getTime();
+                  }
+                });
+
+                finalDocument = sortedByDate[0];
+                console.log('⚠️ Using date-based fallback - selected document from:', new Date((finalDocument.attributes || finalDocument).publicationDate || (finalDocument.attributes || finalDocument).createdAt));
+              }
+            }
+          }
+        }
+
+        console.log('🎯 Final selected document:', {
+          id: finalDocument.id,
+          title: (finalDocument.attributes || finalDocument).title,
+          documentType: ((finalDocument.attributes || finalDocument).document_type?.data?.attributes?.name ||
+                         (finalDocument.attributes || finalDocument).document_type?.name ||
+                         'Unknown'),
+          category: categorySlug,
+          selectionMethod: isIdSlug ? 'ID-based' : 'Slug-based with category filtering'
+        });
+
+        // Process the selected document
+        const docData = finalDocument.attributes || finalDocument;
+        const baseUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+
+        // Extract file information
+        let documentFileUrl = '';
+        let documentFileName = 'Document';
+        let documentFileHash = '';
+        let coverUrl = '';
+
+        if (docData.DocumentFile?.data?.attributes?.url) {
+          documentFileUrl = constructFileUrl(docData.DocumentFile.data.attributes.url, baseUrl);
+          documentFileName = docData.DocumentFile.data.attributes.name || 'Document';
+          documentFileHash = docData.DocumentFile.data.attributes.hash || '';
+        } else if (docData.DocumentFile?.url) {
+          documentFileUrl = constructFileUrl(docData.DocumentFile.url, baseUrl);
+          documentFileName = docData.DocumentFile.name || 'Document';
+          documentFileHash = docData.DocumentFile.hash || '';
+        } else if (docData.documentFileUrl) {
+          documentFileUrl = constructFileUrl(docData.documentFileUrl, baseUrl);
+          documentFileName = docData.documentFileName || 'Document';
+        }
+
+        // Handle cover image
+        if (docData.coverImg?.data?.attributes?.url) {
+          coverUrl = constructFileUrl(docData.coverImg.data.attributes.url, baseUrl);
+        } else if (docData.coverImg?.url) {
+          coverUrl = constructFileUrl(docData.coverImg.url, baseUrl);
+        } else if (docData.coverImg) {
+          coverUrl = constructFileUrl(docData.coverImg, baseUrl);
+        } else if (docData.coverUrl) {
+          coverUrl = constructFileUrl(docData.coverUrl, baseUrl);
+        }
+
+        console.log('📄 Document file URL:', documentFileUrl);
+        console.log('📄 Document file name:', documentFileName);
+        console.log('🖼️ Cover URL:', coverUrl);
+
+        setDocument({
+          id: finalDocument.id,
+          title: docData.title || docData.Title || 'Untitled Document',
+          author: docData.author || docData.Author || '',
+          coverUrl,
+          publisher: docData.publisher || docData.Publisher || '',
+          publicationDate: docData.publicationDate || '',
+          documentType: docData.document_type?.data?.attributes?.name ||
+                      docData.document_type?.name ||
+                      docData.documentType || '',
+          documentFileUrl,
+          documentFileName,
+          documentFileHash
+        });
+
+      } catch (err: any) {
+        console.error('❌ Fetch error:', err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (docSlug) fetchDocument();
+  }, [docSlug, categorySlug, isIdSlug]);
+
+  // Test file accessibility
+  useEffect(() => {
+    const testFileAccessibility = async () => {
+      if (document?.documentFileUrl) {
+        try {
+          const response = await fetch(document.documentFileUrl, {
+            method: 'HEAD',
+            mode: 'cors'
+          });
+          setPdfAccessible(response.ok);
+          console.log('📋 PDF accessible:', response.ok);
+        } catch (error) {
+          console.log('❌ PDF not accessible:', error);
+          setPdfAccessible(false);
+        }
+      }
+
+      if (document?.coverUrl) {
+        try {
+          const response = await fetch(document.coverUrl, {
+            method: 'HEAD',
+            mode: 'cors'
+          });
+          setImageAccessible(response.ok);
+          console.log('🖼️ Image accessible:', response.ok);
+        } catch (error) {
+          console.log('❌ Image not accessible:', error);
+          setImageAccessible(false);
+        }
+      }
+    };
+
+    if (document) {
+      testFileAccessibility();
+    }
+  }, [document]);
+
+  if (isLoading) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-maroon mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading document...</p>
+      </div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="text-center p-8 max-w-md">
+        <div className="text-red-500 text-5xl mb-4">⚠️</div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Error Loading Document</h2>
+        <p className="text-gray-600 mb-6">{error}</p>
+        <Link
+          href={`/category/${categorySlug}`}
+          className="inline-flex items-center bg-maroon text-white px-6 py-3 rounded-lg hover:bg-maroon-dark transition-colors"
+        >
+          ← Back to {categoryTitle}
+        </Link>
+      </div>
+    </div>
+  );
+
+  if (!document) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="text-center p-8 max-w-md">
+        <div className="text-gray-400 text-5xl mb-4">📄</div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Document not found</h2>
+        <p className="text-gray-600 mb-6">The requested document could not be found.</p>
+        <Link
+          href={`/category/${categorySlug}`}
+          className="inline-flex items-center bg-maroon text-white px-6 py-3 rounded-lg hover:bg-maroon-dark transition-colors"
+        >
+          ← Back to {categoryTitle}
+        </Link>
+      </div>
+    </div>
+  );
+
+  const googleViewerUrl = document.documentFileUrl ? getGoogleViewerUrl(document.documentFileUrl) : '';
+
+  return (
+    <div className="relative z-40 min-h-screen bg-white">
+      <div className="container mx-auto px-4 py-8 pt-24">
+        {/* Debug Info - Remove in production */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+            <strong>Debug Info:</strong>
+            <br />• Lookup method: {isIdSlug ? `ID (${docSlug})` : `Slug (${docSlug})`}
+            <br />• Category: {categorySlug}
+            <br />• Document ID: {document.id}
+            <br />• Document Type: {document.documentType || 'Not specified'}
+          </div>
+        )}
+
+        <nav className="mb-8 text-sm text-gray-600">
+          <Link href="/" className="hover:text-maroon">Home</Link>
+          <span className="mx-2">/</span>
+          <Link href={`/category/${categorySlug}`} className="hover:text-maroon">{categoryTitle}</Link>
+          <span className="mx-2">/</span>
+          <span className="text-gray-800">{document.title}</span>
+        </nav>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left Column */}
+          <div className="w-full lg:w-1/3">
+            <div className="sticky top-24">
+              {/* Cover Image */}
+              <div className="bg-gray-100 rounded-lg overflow-hidden shadow-md mb-6 h-64 flex items-center justify-center">
+                {document.coverUrl && imageAccessible ? (
+                  <Image
+                    src={document.coverUrl}
+                    height={400}
+                    width={300}
+                    alt={document.title}
+                    className="w-full h-full object-cover"
+                    unoptimized={true}
+                  />
+                ) : (
+                  <div className="text-center text-gray-500">
+                    <div className="text-4xl mb-2">📄</div>
+                    <p className="text-sm">No cover image available</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              {document.documentFileUrl && (
+                <div className="space-y-4">
+                  {!pdfAccessible && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                      <p className="text-sm text-yellow-800">
+                        ⚠️ PDF file not accessible. The file may need to be re-uploaded.
+                      </p>
+                    </div>
+                  )}
+
+                  <a
+                    href={pdfAccessible ? document.documentFileUrl : googleViewerUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full bg-maroon text-white text-center py-3 px-4 rounded-lg hover:bg-maroon-dark transition-colors font-medium"
+                    download={pdfAccessible ? document.documentFileName : undefined}
+                  >
+                    {pdfAccessible ? 'Download PDF' : 'View with Google Docs'}
+                  </a>
+
+                  {!pdfAccessible && (
+                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                      <p className="text-sm text-gray-600">
+                        File hash: {document.documentFileHash || 'N/A'}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Provide this to your administrator for file recovery
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="w-full lg:w-2/3">
+            {/* Document Details */}
+            <div className="bg-white rounded-lg p-6 shadow-md mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 mb-6">{document.title}</h1>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {document.author && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Author(s)</h3>
+                    <p className="text-gray-800">{document.author}</p>
+                  </div>
+                )}
+                {document.publisher && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Publisher</h3>
+                    <p className="text-gray-800">{document.publisher}</p>
+                  </div>
+                )}
+                {document.publicationDate && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Publication Date</h3>
+                    <p className="text-gray-800">{document.publicationDate}</p>
+                  </div>
+                )}
+                {document.documentType && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Document Type</h3>
+                    <p className="text-gray-800">{document.documentType}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* PDF Preview */}
+            {document.documentFileUrl ? (
+              <div className="bg-white rounded-lg p-6 shadow-md">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold text-gray-800">Document Preview</h2>
+                  <span className="text-sm text-gray-500">
+                    {!pdfAccessible ? 'Google Viewer' : 'PDF'}
+                  </span>
+                </div>
+
+                <div className="border rounded-lg overflow-hidden bg-gray-50">
+                  <iframe
+                    src={!pdfAccessible ? googleViewerUrl : document.documentFileUrl}
+                    className="w-full h-[600px]"
+                    title={`PDF Preview: ${document.title}`}
+                  />
+
+                  {!pdfAccessible && (
+                    <div className="text-center py-8 bg-white">
+                      <div className="text-yellow-500 text-4xl mb-2">⚠️</div>
+                      <p className="text-gray-600">Original PDF file not accessible</p>
+                      <p className="text-sm text-gray-400 mt-1">Using Google Docs viewer as fallback</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg p-6 shadow-md text-center py-12">
+                <div className="text-gray-400 text-5xl mb-4">📄</div>
+                <h3 className="text-lg font-medium text-gray-600 mb-2">Document not available</h3>
+                <p className="text-gray-500">This document doesn't have a file attached.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-12 pt-6 border-t border-gray-200">
+          <Link
+            href={`/category/${categorySlug}`}
+            className="inline-flex items-center text-maroon font-medium hover:text-maroon-dark transition-colors"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to {categoryTitle}
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}

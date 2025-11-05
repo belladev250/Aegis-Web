@@ -35,7 +35,7 @@ const ResearchProjects = () => {
                         <p>Our research projects are aimed at answering diverse research questions giving the opportunity to study an area of interest in depth.
                             Under the Research and Engagement programme, different projects are run and administrated with the purpose to inform action, gather
                             evidence for theories, and contribute to develop knowledge on peace building and peace education.</p>
-                        <Link href="" className='inline-block bg-maroon text-white px-4 py-2 lg:p-3 rounded-md hover:bg-maroon-dark transition-colors'>
+                        <Link href="/submitresearch" className='inline-block bg-maroon text-white px-4 py-2 lg:p-3 rounded-md hover:bg-maroon-dark transition-colors'>
                             Submit Research
                         </Link>
                     </div>
